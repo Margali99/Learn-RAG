@@ -1,23 +1,35 @@
 <!DOCTYPE html>
+
 <html>
 
 <head>
 
-<title>Enterprise RAG Simulator</title>
+<meta charset="UTF-8">
+
+<title>
+Enterprise RAG Simulator
+</title>
 
 
 <style>
 
+
 *{
 box-sizing:border-box;
-font-family:Inter,Segoe UI,Arial;
+font-family:
+Segoe UI,
+Arial,
+sans-serif;
 }
+
 
 
 body{
 
 margin:0;
-background:#060b18;
+
+background:#07101f;
+
 color:#e5e7eb;
 
 }
@@ -27,6 +39,7 @@ color:#e5e7eb;
 header{
 
 padding:30px;
+
 text-align:center;
 
 background:
@@ -43,9 +56,11 @@ linear-gradient(
 header h1{
 
 font-size:36px;
+
 margin:0;
 
 }
+
 
 
 header p{
@@ -65,13 +80,18 @@ padding:25px;
 
 
 
-.panel{
+
+.card{
 
 background:#111827;
+
+border:1px solid #273244;
+
 border-radius:18px;
-padding:22px;
-margin-bottom:22px;
-border:1px solid #1f2937;
+
+padding:20px;
+
+margin-bottom:20px;
 
 }
 
@@ -80,29 +100,44 @@ border:1px solid #1f2937;
 .grid{
 
 display:grid;
+
 grid-template-columns:
-repeat(auto-fit,minmax(280px,1fr));
+repeat(
+auto-fit,
+minmax(330px,1fr)
+);
+
 gap:20px;
 
 }
 
 
 
-input,button{
 
-width:100%;
-padding:12px;
-border-radius:10px;
-border:none;
+h2{
+
+color:#a5b4fc;
 
 }
+
 
 
 
 input{
 
 background:#020617;
+
 color:white;
+
+border:none;
+
+padding:12px;
+
+border-radius:10px;
+
+width:100%;
+
+margin:8px 0;
 
 }
 
@@ -111,9 +146,18 @@ color:white;
 button{
 
 background:#6366f1;
+
 color:white;
-font-weight:bold;
+
+border:none;
+
+padding:12px 18px;
+
+border-radius:10px;
+
 cursor:pointer;
+
+font-weight:bold;
 
 }
 
@@ -127,66 +171,53 @@ background:#818cf8;
 
 
 
-.pipeline{
+button:disabled{
 
-display:grid;
-grid-template-columns:
-repeat(auto-fit,minmax(350px,1fr));
+background:#475569;
 
-gap:20px;
+cursor:not-allowed;
 
 }
 
 
 
-.card{
+.remove{
 
-background:#111827;
-padding:20px;
-border-radius:18px;
-border:1px solid #263244;
+background:#dc2626;
 
-}
-
-
-
-.card.active{
-
-border:
-2px solid #818cf8;
-
-box-shadow:
-0 0 30px #6366f155;
+width:auto;
 
 }
 
 
 
-h2{
-
-color:#a5b4fc;
-
-}
-
-
-
-.section-title{
-
-color:#38bdf8;
-font-weight:bold;
-
-}
-
-
-
-.io{
+.box{
 
 background:#020617;
-padding:15px;
+
 border-radius:12px;
-margin-top:12px;
-font-size:14px;
+
+padding:15px;
+
+margin-top:10px;
+
+white-space:pre-wrap;
+
 line-height:1.6;
+
+font-size:14px;
+
+}
+
+
+
+.section{
+
+color:#38bdf8;
+
+font-weight:bold;
+
+margin-top:15px;
 
 }
 
@@ -200,34 +231,41 @@ color:#4ade80;
 
 
 
-.remove{
+.warning{
 
-background:#dc2626;
-padding:6px 12px;
-width:auto;
+color:#facc15;
 
 }
 
 
 
-.stats{
 
-display:flex;
-gap:15px;
-flex-wrap:wrap;
+.pipeline-title{
+
+font-size:20px;
+
+font-weight:bold;
+
+color:#38bdf8;
+
+margin-bottom:15px;
+
+}
+
+
+
+.active{
+
+border:
+
+2px solid #818cf8;
+
+box-shadow:
+0 0 25px #6366f155;
 
 }
 
 
-
-.stat{
-
-background:#020617;
-padding:15px;
-border-radius:12px;
-flex:1;
-
-}
 
 
 </style>
@@ -236,19 +274,25 @@ flex:1;
 </head>
 
 
+
 <body>
 
 
 
 <header>
 
+
 <h1>
+
 🧠 Enterprise RAG Simulator
+
 </h1>
 
 
 <p>
-Upload documents → Chunk → Embed → Pinecone → Retrieve → Rerank → LLM
+
+Knowledge Base → Chunk → Embed → Pinecone → Retrieve → Grounded LLM
+
 </p>
 
 
@@ -258,47 +302,53 @@ Upload documents → Chunk → Embed → Pinecone → Retrieve → Rerank → LL
 
 
 
+
 <div class="container">
 
 
 
-<!-- DOCUMENT UPLOAD -->
 
 
-<div class="panel">
+<!-- =====================
+KNOWLEDGE BASE
+===================== -->
+
+
+
+<div class="card">
 
 
 <h2>
-📚 1. Knowledge Base
+📚 Step 1: Knowledge Base Upload
 </h2>
 
 
-<input 
+<input
+
 type="file"
-id="documentsInput"
+
+id="fileInput"
+
 multiple
-accept=".txt,.pdf,.docx">
+
+accept=".pdf,.txt,.docx"
+
+>
 
 
-<br><br>
-
-
-<button onclick="addDocuments()">
+<button onclick="uploadDocuments()">
 
 + Add Documents
 
 </button>
 
 
-<br><br>
 
+<div
 
+id="uploadMessage"
 
-<div id="uploadStatus"></div>
-
-
-
-<div id="documentList" class="io">
+class="box">
 
 No documents uploaded
 
@@ -306,6 +356,36 @@ No documents uploaded
 
 
 
+
+<div
+
+id="documentList"
+
+class="box">
+
+</div>
+
+
+
+
+
+<button
+
+id="processButton"
+
+onclick="startKnowledgeProcessing()"
+
+style="display:none">
+
+
+✅ OK - Process Knowledge Base
+
+
+</button>
+
+
+
+
 </div>
 
 
@@ -315,69 +395,61 @@ No documents uploaded
 
 
 
-<!-- STATS -->
+
+<!-- =====================
+CONFIGURATION
+===================== -->
 
 
-<div class="panel">
+<div class="card">
 
 
 <h2>
-Knowledge Base Statistics
+⚙️ Step 2: Chunking Configuration
 </h2>
 
 
-<div class="stats">
+<label>
+
+Chunk Length
+
+</label>
 
 
-<div class="stat">
+<input
 
-Documents
+id="chunkLength"
 
-<h2 id="docCount">
-0
-</h2>
+type="number"
 
-</div>
+value="500"
 
-
-<div class="stat">
-
-Chunks
-
-<h2 id="chunkCount">
-0
-</h2>
-
-</div>
+>
 
 
-<div class="stat">
 
-Vectors
+<label>
 
-<h2 id="vectorCount">
-0
-</h2>
+Chunk Overlap
 
-</div>
+</label>
 
 
-<div class="stat">
+<input
 
-Embedding Size
+id="chunkOverlap"
 
-<h2>
-1536
-</h2>
+type="number"
 
-</div>
+value="100"
+
+>
 
 
 
 </div>
 
 
-</div>
 
 
 
@@ -385,129 +457,187 @@ Embedding Size
 
 
 
+<!-- =====================
+STATS
+===================== -->
 
-<!-- CHUNK SETTINGS -->
 
 
-<div class="panel">
+<div class="card">
 
 
 <h2>
-✂️ 2. Chunking Configuration
+📊 Knowledge Base Statistics
 </h2>
 
 
 <div class="grid">
 
 
-<div>
 
-<label>
-Chunk Length
-</label>
+<div class="box">
 
-<input
-id="chunkSize"
-type="number"
-value="500">
+Documents
 
-</div>
+<h2 id="docCount">
 
+0
 
-
-<div>
-
-<label>
-Overlap Length
-</label>
-
-
-<input
-id="overlap"
-type="number"
-value="100">
-
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-
-
-
-
-<!-- PIPELINE -->
-
-
-
-<div class="pipeline">
-
-
-
-
-
-
-<!-- CHUNK -->
-
-
-<div class="card" id="chunkCard">
-
-
-<h2>
-✂️ Chunking Engine
 </h2>
 
+</div>
 
 
-<div class="section-title">
+
+
+<div class="box">
+
+Chunks
+
+<h2 id="chunkCount">
+
+0
+
+</h2>
+
+</div>
+
+
+
+
+
+<div class="box">
+
+Vectors
+
+<h2 id="vectorCount">
+
+0
+
+</h2>
+
+</div>
+
+
+
+
+
+<div class="box">
+
+Embedding Dimension
+
+<h2>
+
+1536
+
+</h2>
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- =====================
+PIPELINE
+===================== -->
+
+
+
+<div class="grid">
+
+
+
+
+
+
+
+<!-- CHUNKING -->
+
+
+
+<div class="card"
+
+id="chunkCard">
+
+
+<div class="pipeline-title">
+
+✂️ Step 3: Chunking Engine
+
+</div>
+
+
+
+<div class="section">
+
 INPUT
-</div>
-
-
-<div class="io" id="chunkInput">
-
-Waiting for documents...
 
 </div>
 
 
+<div
 
-<div class="section-title">
+id="chunkInput"
+
+class="box">
+
+Waiting for processing...
+
+</div>
+
+
+
+
+<div class="section">
+
 PROCESS
+
 </div>
 
 
-<div class="io">
+<div class="box">
 
 Sliding Window Chunking
 
 <br>
 
-User defined size + overlap
+Chunk Size + Overlap
 
 </div>
 
 
 
-<div class="section-title">
+
+<div class="section">
+
 OUTPUT
+
 </div>
 
 
-<div class="io" id="chunksOutput">
+<div
+
+id="chunkOutput"
+
+class="box">
 
 Waiting...
 
 </div>
+
+
 
 
 </div>
@@ -523,55 +653,75 @@ Waiting...
 <!-- EMBEDDING -->
 
 
-<div class="card" id="embeddingCard">
+
+<div class="card"
+
+id="embeddingCard">
 
 
-<h2>
-🔢 Embedding Model
-</h2>
+<div class="pipeline-title">
 
+🔢 Step 4: Embedding Model
 
-<div class="section-title">
-INPUT
 </div>
 
 
-<div class="io" id="embeddingInput">
+
+<div class="section">
+
+INPUT
+
+</div>
+
+
+<div
+
+id="embeddingInput"
+
+class="box">
 
 Waiting...
 
 </div>
 
 
-<div class="section-title">
+
+
+<div class="section">
+
 PROCESS
-</div>
-
-
-<div class="io">
-
-Text embedding model
-
-<br>
-
-Converts text → vector
 
 </div>
 
 
+<div class="box">
 
-<div class="section-title">
+Text converted into numerical vectors
+
+</div>
+
+
+
+
+<div class="section">
+
 OUTPUT
+
 </div>
 
 
-<div class="io" id="embeddingOutput">
+<div
+
+id="embeddingOutput"
+
+class="box">
 
 Waiting...
 
 </div>
 
 
+
 </div>
 
 
@@ -582,23 +732,36 @@ Waiting...
 
 
 
-<!-- VECTOR DB -->
+<!-- PINECONE -->
 
 
-<div class="card" id="pineconeCard">
+
+<div class="card"
+
+id="pineconeCard">
 
 
-<h2>
-🌲 Pinecone Vector Database
-</h2>
+<div class="pipeline-title">
+
+🌲 Step 5: Pinecone Vector Database
+
+</div>
 
 
-<div class="section-title">
+
+
+<div class="section">
+
 INPUT
+
 </div>
 
 
-<div class="io" id="pineconeInput">
+<div
+
+id="pineconeInput"
+
+class="box">
 
 Waiting...
 
@@ -606,37 +769,45 @@ Waiting...
 
 
 
-<div class="section-title">
+
+<div class="section">
+
 PROCESS
+
 </div>
 
 
-<div class="io">
+<div class="box">
 
-Store:
-
-<br>
-
-Vector
+Vector indexing
 
 +
 
-Metadata
+Metadata storage
 
 </div>
 
 
 
-<div class="section-title">
+
+<div class="section">
+
 OUTPUT
+
 </div>
 
 
-<div class="io" id="pineconeOutput">
+<div
+
+id="pineconeOutput"
+
+class="box">
 
 Waiting...
 
 </div>
+
+
 
 
 </div>
@@ -652,56 +823,43 @@ Waiting...
 <!-- QUERY -->
 
 
-<div class="card" id="queryCard">
+
+<div class="card"
+
+id="queryCard">
 
 
-<h2>
-🔍 User Query
-</h2>
+<div class="pipeline-title">
+
+🔍 Step 6: User Query
+
+</div>
+
 
 
 <input
+
 id="userQuery"
-placeholder=
-"Ask anything from your documents">
+
+placeholder="Ask a question from your documents"
+
+>
 
 
-<div class="io" id="queryOutput">
+<button onclick="runRAG()">
 
-Waiting...
+🚀 Search Knowledge Base
 
-</div>
-
-
-</div>
-
-
+</button>
 
 
 
 
+<div
 
+id="queryOutput"
 
-
-<!-- RETRIEVAL -->
-
-
-<div class="card" id="retrievalCard">
-
-
-<h2>
-⚡ Hybrid Retrieval
-</h2>
-
-
-<div class="section-title">
-
-INPUT
-
-</div>
-
-
-<div class="io" id="retrievalInput">
+class="box">
 
 Waiting...
 
@@ -709,161 +867,50 @@ Waiting...
 
 
 
-<div class="section-title">
-
-OUTPUT
-
-</div>
-
-
-<div class="io" id="retrievalOutput">
-
-Waiting...
-
-</div>
-
-
 </div>
 
 
 
 
+// =======================================
+// GLOBAL STORAGE
+// =======================================
 
 
-
-
-<!-- RERANK -->
-
-
-<div class="card" id="rerankCard">
-
-
-<h2>
-🏆 Re-ranking Model
-</h2>
-
-
-<div class="io" id="rerankOutput">
-
-Waiting...
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-
-<!-- PROMPT -->
-
-
-<div class="card" id="promptCard">
-
-
-<h2>
-📝 Augmented Prompt
-</h2>
-
-
-<div class="io" id="promptOutput">
-
-Waiting...
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-
-<!-- LLM -->
-
-
-<div class="card" id="llmCard">
-
-
-<h2>
-🤖 LLM Response
-</h2>
-
-
-<div class="io" id="llmOutput">
-
-Waiting...
-
-</div>
-
-
-</div>
-
-
-
-
-
-</div>
-
-
-
-</div>
-
-
-
-
-<script>
-
-
-let documents=[];
-
-
-let chunks=[];
-
-
-let vectors=[];
-
-
-
-</script>
-
-
-</body>
-
-</html>
 let documents = [];
 
 let chunks = [];
 
 let vectors = [];
 
+let rerankedResults = [];
 
 
 
 
-// ===============================
-// ADD DOCUMENTS
-// ===============================
 
 
-async function addDocuments(){
+
+// =======================================
+// UPLOAD DOCUMENTS
+// =======================================
+
+
+async function uploadDocuments(){
 
 
 let files =
 document
-.getElementById("documentsInput")
+.getElementById("fileInput")
 .files;
 
 
 
 if(files.length===0){
 
-alert("Please select documents");
+alert(
+"Please select documents first"
+);
 
 return;
 
@@ -874,23 +921,22 @@ return;
 for(let file of files){
 
 
+
 let text="";
+
 
 
 try{
 
-
 text =
 await file.text();
 
-
 }
-catch(e){
 
+catch(e){
 
 text =
 "Unable to extract text from file";
-
 
 }
 
@@ -898,17 +944,16 @@ text =
 
 documents.push({
 
+
 id:
 Date.now()+Math.random(),
 
 
-name:file.name,
+name:
+file.name,
 
 
-text:text,
-
-
-size:file.size
+text:text
 
 
 });
@@ -919,28 +964,50 @@ size:file.size
 
 
 
+
 document
-.getElementById("uploadStatus")
+.getElementById("uploadMessage")
 .innerHTML=
+
+
 `
-<div class="success">
+
+<span class="success">
 
 ✅ Successfully uploaded 
 ${files.length}
 document(s)
 
-</div>
+</span>
+
+
+<br><br>
+
+Documents ready for ingestion.
+
+<br>
+
+Click OK to start:
+
+Chunking → Embedding → Pinecone
+
 `;
+
+
+
+
+document
+.getElementById("processButton")
+.style.display="block";
 
 
 
 renderDocuments();
 
 
+
 updateStats();
 
-
-processKnowledgeBase();
 
 
 }
@@ -953,59 +1020,60 @@ processKnowledgeBase();
 
 
 
-// ===============================
-// DISPLAY DOCUMENT LIST
-// ===============================
-
+// =======================================
+// DISPLAY DOCUMENTS
+// =======================================
 
 
 function renderDocuments(){
 
 
 
-let html="";
+let output="";
 
 
 
 documents.forEach(doc=>{
 
 
-html+=`
-
-<div>
+output +=
 
 
-📄 
-<b>${doc.name}</b>
+`
+
+📄 ${doc.name}
 
 
 <br>
+
 
 Characters:
 
 ${doc.text.length}
 
 
-<br><br>
+
+<br>
 
 
-<button 
+<button
+
 class="remove"
-onclick="removeDocument('${doc.id}')">
+
+onclick="removeDocument('${doc.id}')"
+
+>
 
 Remove
 
 </button>
 
 
+
 <hr>
 
 
-</div>
-
-
 `;
-
 
 
 });
@@ -1016,8 +1084,7 @@ Remove
 document
 .getElementById("documentList")
 .innerHTML =
-html ||
-"No documents uploaded";
+output;
 
 
 
@@ -1030,14 +1097,12 @@ html ||
 
 
 
-// ===============================
+// =======================================
 // REMOVE DOCUMENT
-// ===============================
-
+// =======================================
 
 
 function removeDocument(id){
-
 
 
 documents =
@@ -1050,10 +1115,8 @@ d=>d.id!=id
 renderDocuments();
 
 
-processKnowledgeBase();
-
-
 updateStats();
+
 
 
 }
@@ -1066,42 +1129,133 @@ updateStats();
 
 
 
-// ===============================
+// =======================================
+// START KNOWLEDGE PROCESSING
+// =======================================
+
+
+async function startKnowledgeProcessing(){
+
+
+
+if(documents.length===0){
+
+return;
+
+}
+
+
+
+let button =
+document
+.getElementById("processButton");
+
+
+
+button.innerHTML =
+"⏳ Processing...";
+
+
+button.disabled=true;
+
+
+
+
+await runChunking();
+
+
+
+await runEmbedding();
+
+
+
+await runPinecone();
+
+
+
+
+
+button.innerHTML =
+
+"✅ Knowledge Base Ready";
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =======================================
 // CHUNKING ENGINE
-// ===============================
+// =======================================
 
 
-function createChunks(
-text,
-chunkSize,
-overlap,
-source
-){
+
+async function runChunking(){
 
 
-let result=[];
+
+activate("chunkCard");
+
+
+
+chunks=[];
+
+
+
+let size =
+
+Number(
+document
+.getElementById("chunkLength")
+.value
+);
+
+
+
+let overlap =
+
+Number(
+document
+.getElementById("chunkOverlap")
+.value
+);
+
+
+
+
+
+
+documents.forEach(doc=>{
 
 
 let start=0;
 
 
-let counter=1;
+let count=1;
 
 
 
-while(start < text.length){
+while(start < doc.text.length){
+
 
 
 let end =
 Math.min(
-start+chunkSize,
-text.length
+start+size,
+doc.text.length
 );
 
 
 
-let chunk =
-text.substring(
+let text =
+doc.text.substring(
 start,
 end
 );
@@ -1117,7 +1271,7 @@ if(start>0){
 
 
 overlapText =
-text.substring(
+doc.text.substring(
 start-overlap,
 start
 );
@@ -1127,23 +1281,28 @@ start
 
 
 
-result.push({
+
+
+chunks.push({
+
 
 id:
-counter++,
+chunks.length+1,
 
 
-text:chunk,
+source:
+doc.name,
+
+
+text:text,
 
 
 overlap:
-overlapText,
-
-
-source:source
+overlapText
 
 
 });
+
 
 
 
@@ -1152,93 +1311,12 @@ end-overlap;
 
 
 
-if(start>=text.length)
-break;
+if(start<0)
+
+start=0;
 
 
 }
-
-
-
-return result;
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// ===============================
-// PROCESS KNOWLEDGE BASE
-// ===============================
-
-
-
-function processKnowledgeBase(){
-
-
-if(documents.length===0)
-return;
-
-
-
-chunks=[];
-
-vectors=[];
-
-
-
-let chunkSize =
-Number(
-document
-.getElementById("chunkSize")
-.value
-);
-
-
-
-let overlap =
-Number(
-document
-.getElementById("overlap")
-.value
-);
-
-
-
-
-
-
-// CREATE CHUNKS
-
-
-documents.forEach(doc=>{
-
-
-let docChunks =
-createChunks(
-
-doc.text,
-
-chunkSize,
-
-overlap,
-
-doc.name
-
-);
-
-
-
-chunks.push(
-...docChunks
-);
 
 
 
@@ -1247,10 +1325,6 @@ chunks.push(
 
 
 
-
-
-
-// CHUNK INPUT
 
 
 document
@@ -1268,7 +1342,7 @@ ${documents.length}
 
 Chunk Size:
 
-${chunkSize}
+${size}
 
 
 <br>
@@ -1285,17 +1359,9 @@ ${overlap}
 
 
 
-
-
-
-
-// CHUNK OUTPUT
-
-
-
 document
-.getElementById("chunksOutput")
-.innerHTML =
+.getElementById("chunkOutput")
+.innerHTML=
 
 
 chunks
@@ -1306,30 +1372,35 @@ chunks
 `
 
 <b>
-${c.source}
-</b>
 
-
-<br>
-
-
-<b>
 Chunk ${c.id}
+
 </b>
 
 
+<br>
+
+
+Source:
+
+${c.source}
+
+
+
 <br><br>
 
 
 <strong>
-Main Content:
+
+Chunk Text:
+
 </strong>
 
 
 <br>
 
 
-${c.text.substring(0,250)}
+${c.text}
 
 
 
@@ -1337,20 +1408,17 @@ ${c.text.substring(0,250)}
 
 
 
-<strong>
+<strong style="color:#facc15">
+
 Overlap Section:
+
 </strong>
 
 
 <br>
 
 
-<span style="color:#facc15">
-
-${c.overlap.substring(0,120)}
-
-</span>
-
+${c.overlap || "No overlap"}
 
 <hr>
 
@@ -1364,54 +1432,58 @@ ${c.overlap.substring(0,120)}
 
 
 
+updateStats();
 
 
-
-
-
-
-
-// ===============================
-// EMBEDDINGS
-// ===============================
-
-
-
-vectors =
-chunks.map(c=>{
-
-
-return {
-
-
-chunkId:c.id,
-
-
-source:c.source,
-
-
-text:c.text,
-
-
-vector:
-generateEmbedding(c.text),
-
-
-metadata:{
-
-source:c.source,
-
-chunk:c.id
 
 }
 
 
-};
+
+
+
+
+
+
+
+// =======================================
+// EMBEDDING MODEL
+// =======================================
+
+
+
+async function runEmbedding(){
+
+
+
+activate("embeddingCard");
+
+
+
+vectors=[];
+
+
+
+chunks.forEach(c=>{
+
+
+vectors.push({
+
+
+chunk:c,
+
+
+vector:
+generateEmbedding(
+c.text
+)
 
 
 });
 
 
+
+});
 
 
 
@@ -1428,7 +1500,8 @@ document
 
 Chunk:
 
-${chunks[0]?.text.substring(0,120)}
+
+${chunks[0]?.text}
 
 `;
 
@@ -1440,18 +1513,10 @@ document
 .getElementById("embeddingOutput")
 .innerHTML=
 
+
 `
 
-Original Text:
-
-
-"${chunks[0]?.text.substring(0,150)}"
-
-
-<br><br>
-
-
-Embedding Vector:
+Vector:
 
 
 <br>
@@ -1459,7 +1524,7 @@ Embedding Vector:
 
 [
 
-${vectors[0]?.vector.join(", ")}
+${vectors[0]?.vector}
 
 ]
 
@@ -1467,9 +1532,28 @@ ${vectors[0]?.vector.join(", ")}
 <br><br>
 
 
-Dimensions:
+Embedding Dimensions:
 
 1536
+
+
+<br>
+
+
+Metadata:
+
+
+<br>
+
+{
+
+source:
+"${chunks[0]?.source}",
+
+chunk:
+"${chunks[0]?.id}"
+
+}
 
 
 `;
@@ -1478,6 +1562,11 @@ Dimensions:
 
 
 
+updateStats();
+
+
+
+}
 
 
 
@@ -1485,9 +1574,19 @@ Dimensions:
 
 
 
-// ===============================
-// PINECONE DATABASE
-// ===============================
+
+
+// =======================================
+// PINECONE SIMULATION
+// =======================================
+
+
+
+async function runPinecone(){
+
+
+
+activate("pineconeCard");
 
 
 
@@ -1497,23 +1596,32 @@ document
 
 `
 
-Vectors received:
+Received:
 
 ${vectors.length}
+
+vectors
 
 
 <br>
 
-Metadata attached:
+Each vector contains:
 
-Source
+<br>
 
-+
+✓ Embedding
 
-Chunk ID
+<br>
 
+✓ Document metadata
+
+<br>
+
+✓ Chunk ID
 
 `;
+
+
 
 
 
@@ -1521,15 +1629,16 @@ document
 .getElementById("pineconeOutput")
 .innerHTML=
 
+
 `
 
-🌲 Pinecone Index Updated
+🌲 Pinecone Index Created
 
 
 <br><br>
 
 
-Index:
+Index Name:
 
 knowledge-base-index
 
@@ -1547,16 +1656,19 @@ ${vectors.length}
 
 Status:
 
-✅ Ready for Retrieval
+<span class="success">
+
+READY FOR SEARCH
+
+</span>
 
 
 `;
 
 
 
-
-
 updateStats();
+
 
 
 }
@@ -1569,9 +1681,9 @@ updateStats();
 
 
 
-// ===============================
-// SIMULATED EMBEDDING MODEL
-// ===============================
+// =======================================
+// SIMULATED EMBEDDING
+// =======================================
 
 
 
@@ -1583,13 +1695,22 @@ let vector=[];
 
 
 
-for(let i=0;i<12;i++){
+for(
+let i=0;
+i<12;
+i++
+){
 
 
 let value=0;
 
 
-for(let j=i;j<text.length;j+=12){
+
+for(
+let j=i;
+j<text.length;
+j+=12
+){
 
 
 value +=
@@ -1597,6 +1718,7 @@ text.charCodeAt(j);
 
 
 }
+
 
 
 
@@ -1615,6 +1737,7 @@ Number(
 }
 
 
+
 return vector;
 
 
@@ -1628,15 +1751,13 @@ return vector;
 
 
 
-
-
-// ===============================
-// UPDATE STATS
-// ===============================
-
+// =======================================
+// UPDATE STATISTICS
+// =======================================
 
 
 function updateStats(){
+
 
 
 document
@@ -1661,9 +1782,55 @@ vectors.length;
 
 
 }
-// =================================
-// USER QUERY PIPELINE
-// =================================
+
+
+
+
+
+
+
+
+
+// =======================================
+// VISUAL ANIMATION
+// =======================================
+
+
+function activate(id){
+
+
+
+let card =
+document
+.getElementById(id);
+
+
+
+if(card){
+
+
+card.classList.add("active");
+
+
+
+setTimeout(()=>{
+
+
+card.classList.remove("active");
+
+
+},1000);
+
+
+
+}
+
+
+
+}
+// =======================================
+// RUN RAG QUERY PIPELINE
+// =======================================
 
 
 async function runRAG(){
@@ -1672,7 +1839,7 @@ async function runRAG(){
 if(vectors.length===0){
 
 alert(
-"Please upload documents first"
+"Please process documents first"
 );
 
 return;
@@ -1682,6 +1849,7 @@ return;
 
 
 let query =
+
 document
 .getElementById("userQuery")
 .value;
@@ -1705,28 +1873,27 @@ return;
 
 
 
-
 // ===============================
 // QUERY EMBEDDING
 // ===============================
 
 
 
-await activate(
-"queryCard"
-);
+activate("queryCard");
 
 
 
 let queryVector =
+
 generateEmbedding(query);
+
+
 
 
 
 document
 .getElementById("queryOutput")
-.innerHTML =
-
+.innerHTML=
 
 `
 
@@ -1740,6 +1907,7 @@ User Query:
 ${query}
 
 
+
 <br><br>
 
 
@@ -1748,7 +1916,13 @@ ${query}
 
 <br>
 
-Embedding Model converts query into vector
+Embedding Model
+
+
+<br>
+
+Text → Vector
+
 
 
 <br><br>
@@ -1759,7 +1933,6 @@ Embedding Model converts query into vector
 
 <br>
 
-
 Query Vector:
 
 
@@ -1768,21 +1941,19 @@ Query Vector:
 
 [
 
-${queryVector.join(", ")}
+${queryVector}
 
 ]
 
 
-<br><br>
+<br>
 
 
 Dimensions:
 
 1536
 
-
 `;
-
 
 
 
@@ -1797,11 +1968,7 @@ Dimensions:
 // ===============================
 
 
-
-await activate(
-"retrievalCard"
-);
-
+activate("retrievalCard");
 
 
 
@@ -1809,14 +1976,19 @@ let results=[];
 
 
 
-vectors.forEach(v=>{
+vectors.forEach(item=>{
+
 
 
 let cosine =
+
 Number(
 cosineSimilarity(
+
 queryVector,
-v.vector
+
+item.vector
+
 )
 
 );
@@ -1824,13 +1996,20 @@ v.vector
 
 
 let bm25 =
+
 Number(
+
 calculateBM25(
+
 query,
-v.text
+
+item.chunk.text
+
 )
 
 );
+
+
 
 
 
@@ -1840,14 +2019,17 @@ let hybrid =
 cosine*0.6
 +
 bm25*0.4
-
 );
+
+
 
 
 
 results.push({
 
-...v,
+
+...item,
+
 
 cosine,
 
@@ -1866,22 +2048,19 @@ hybrid
 
 
 
-
-// sort best first
-
-
 results.sort(
+
 (a,b)=>
+
 b.hybrid-a.hybrid
+
 );
 
 
 
-
-
 let topResults =
-results.slice(0,5);
 
+results.slice(0,5);
 
 
 
@@ -1900,26 +2079,24 @@ document
 
 `
 
-<b>INPUT</b>
-
-
-<br>
-
 Query Vector
 
 +
 
-Pinecone Index
+Pinecone Vector Index
+
 
 
 <br><br>
 
 
-Search Method:
+Retrieval Method:
+
 
 <br>
 
-60% Semantic Vector Search
+60% Semantic Search
+
 
 <br>
 
@@ -1927,9 +2104,6 @@ Search Method:
 
 
 `;
-
-
-
 
 
 
@@ -1944,19 +2118,22 @@ document
 topResults.map(
 (r,index)=>
 
+
 `
 
 <b>
+
 Result ${index+1}
+
 </b>
 
 
-<br><br>
+<br>
 
 
 Source:
 
-${r.source}
+${r.chunk.source}
 
 
 <br>
@@ -1964,7 +2141,8 @@ ${r.source}
 
 Chunk:
 
-${r.chunkId}
+${r.chunk.id}
+
 
 
 <br><br>
@@ -1997,7 +2175,6 @@ ${r.bm25}
 
 Hybrid Accuracy:
 
-
 <span class="success">
 
 ${Math.round(
@@ -2005,6 +2182,7 @@ r.hybrid*100
 )}%
 
 </span>
+
 
 
 <br>
@@ -2020,6 +2198,7 @@ r.hybrid*0.3
 )
 *100
 )}%
+
 
 
 <hr>
@@ -2038,62 +2217,42 @@ r.hybrid*0.3
 
 
 
-
-
-
 // ===============================
 // RE-RANKING MODEL
 // ===============================
 
 
 
-await activate(
-"rerankCard"
-);
-
-
+activate("rerankCard");
 
 
 
 let reranked =
 
-topResults.map(r=>{
+topResults.map(item=>{
 
 
-let rerankScore =
+return {
 
-Math.min(
 
-100,
+...item,
+
+
+rerankScore:
 
 Math.round(
 
 (
-r.hybrid*100
-
+item.hybrid*100
 +
-
 Math.random()*10
 
 )
 
 )
 
-);
-
-
-
-return {
-
-
-...r,
-
-
-rerankScore
-
 
 };
-
 
 
 })
@@ -2108,12 +2267,8 @@ b.rerankScore-a.rerankScore
 
 
 
-
-
 window.rerankedResults =
 reranked;
-
-
 
 
 
@@ -2124,47 +2279,21 @@ document
 .getElementById("rerankOutput")
 .innerHTML=
 
-
-`
-
-<b>
-Cross Encoder Re-ranking
-</b>
-
-<br><br>
-
-
-Input:
-
-Top ${topResults.length}
-retrieved chunks
-
-
-<br><br>
-
-
-
-Output:
-
-
-<br><br>
-
-
-${
-
 reranked.map(
-(r,i)=>
+(r,index)=>
 
 `
 
-🏆 Rank ${i+1}
+🏆 Rank ${index+1}
 
-<br>
+
+
+<br><br>
 
 
 Source:
 
-${r.source}
+${r.chunk.source}
 
 
 <br>
@@ -2172,14 +2301,13 @@ ${r.source}
 
 Chunk:
 
-${r.chunkId}
+${r.chunk.id}
 
 
 <br>
 
 
-Relevance Score:
-
+Cross Encoder Score:
 
 <span class="success">
 
@@ -2189,48 +2317,43 @@ ${r.rerankScore}%
 
 
 
-<br>
+<br><br>
 
 
-Reason:
+Why selected:
 
-
-<br>
-
-✓ Semantic match
 
 <br>
 
-✓ Keyword alignment
+✓ Semantic relevance
+
 
 <br>
 
-✓ Context relevance
+✓ Keyword match
+
+
+<br>
+
+✓ Context alignment
 
 
 <hr>
 
+
 `
 
 )
-.join("")
-
-}
-
-
-`;
+.join("");
 
 
 
 
-
-
-
-// Continue to prompt generation
 
 generateAugmentedPrompt();
 
 
+
 }
 
 
@@ -2241,16 +2364,12 @@ generateAugmentedPrompt();
 
 
 
-
-
-// =================================
+// =======================================
 // COSINE SIMILARITY
-// =================================
-
+// =======================================
 
 
 function cosineSimilarity(a,b){
-
 
 
 let dot=0;
@@ -2268,16 +2387,13 @@ i++
 ){
 
 
-dot +=
-a[i]*b[i];
+dot += a[i]*b[i];
 
 
-magA +=
-a[i]*a[i];
+magA += a[i]*a[i];
 
 
-magB +=
-b[i]*b[i];
+magB += b[i]*b[i];
 
 
 }
@@ -2287,11 +2403,11 @@ b[i]*b[i];
 return (
 
 dot /
+
 (
 Math.sqrt(magA)
 *
 Math.sqrt(magB)
-
 )
 
 ).toFixed(3);
@@ -2308,12 +2424,9 @@ Math.sqrt(magB)
 
 
 
-
-
-// =================================
+// =======================================
 // BM25 SIMULATION
-// =================================
-
+// =======================================
 
 
 function calculateBM25(
@@ -2323,6 +2436,7 @@ text
 
 
 let words =
+
 query
 .toLowerCase()
 .split(" ");
@@ -2337,13 +2451,15 @@ words.forEach(word=>{
 
 
 if(
+
 text
 .toLowerCase()
 .includes(word)
+
 ){
 
 
-score +=1;
+score++;
 
 
 }
@@ -2367,59 +2483,9 @@ words.length,
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-// =================================
-// CARD ANIMATION
-// =================================
-
-
-
-function activate(id){
-
-
-let card =
-document
-.getElementById(id);
-
-
-
-if(card){
-
-
-card.classList.add(
-"active"
-);
-
-
-setTimeout(()=>{
-
-
-card.classList.remove(
-"active"
-);
-
-
-},800);
-
-
-}
-
-
-
-}
-// =================================
+// =======================================
 // AUGMENTED PROMPT GENERATION
-// =================================
+// =======================================
 
 
 function generateAugmentedPrompt(){
@@ -2427,7 +2493,9 @@ function generateAugmentedPrompt(){
 
 if(!rerankedResults ||
 rerankedResults.length===0)
+
 return;
+
 
 
 
@@ -2436,14 +2504,19 @@ activate("promptCard");
 
 
 let best =
+
 rerankedResults[0];
 
 
 
 let query =
+
 document
 .getElementById("userQuery")
 .value;
+
+
+
 
 
 
@@ -2451,76 +2524,52 @@ let prompt =
 
 `
 
-<b>SYSTEM PROMPT</b>
+SYSTEM PROMPT
 
 
-<br><br>
-
-
-You are a Retrieval Augmented AI assistant.
-
-
-<br>
+You are a Retrieval Augmented AI Assistant.
 
 
 Rules:
 
 
-<br>
+✓ Answer only from retrieved context
 
-✓ Answer only from provided context
+✓ Do not invent information
 
-<br>
-
-✓ Do not hallucinate
-
-<br>
-
-✓ Cite the source document
-
-
-<hr>
-
-
-<b>RETRIEVED CONTEXT</b>
-
-
-<br><br>
-
-
-SOURCE:
-
-${best.source}
-
-
-<br>
-
-
-CHUNK ID:
-
-${best.chunkId}
-
-
-<br><br>
-
-
-CONTENT:
-
-
-<br>
-
-
-${best.text}
+✓ Cite source documents
 
 
 
-<hr>
+--------------------------------
 
 
-<b>USER QUERY</b>
+RETRIEVED CONTEXT
 
 
-<br>
+Source:
+
+${best.chunk.source}
+
+
+
+Chunk ID:
+
+${best.chunk.id}
+
+
+
+Content:
+
+
+${best.chunk.text}
+
+
+
+--------------------------------
+
+
+USER QUERY
 
 
 ${query}
@@ -2533,10 +2582,12 @@ ${query}
 
 
 
+
 document
 .getElementById("promptOutput")
 .innerHTML =
 prompt;
+
 
 
 
@@ -2554,17 +2605,18 @@ generateLLMResponse();
 
 
 
-// =================================
+// =======================================
 // RAG EVALUATION METRICS
-// =================================
+// =======================================
 
 
 
-function calculateEvaluationMetrics(){
+function calculateMetrics(){
 
 
 
 let k =
+
 Math.min(
 5,
 rerankedResults.length
@@ -2572,13 +2624,17 @@ rerankedResults.length
 
 
 
+
 let relevant =
 
-rerankedResults.filter(r=>
+rerankedResults.filter(
+
+r=>
 
 r.rerankScore>=75
 
 ).length;
+
 
 
 
@@ -2588,18 +2644,26 @@ relevant/k;
 
 
 
+
+
 let totalRelevant =
 
 Math.max(
-relevant+1,
-k
+
+k,
+
+relevant+1
+
 );
+
 
 
 
 let recall =
 
-relevant/totalRelevant;
+relevant/
+totalRelevant;
+
 
 
 
@@ -2608,32 +2672,43 @@ relevant/totalRelevant;
 // MRR
 
 
-let firstRelevantRank=0;
+let firstCorrectRank=0;
 
 
-rerankedResults.forEach(
-(r,i)=>{
+
+rerankedResults
+.forEach(
+
+(r,index)=>{
 
 
 if(
-r.rerankScore>=75 &&
-firstRelevantRank===0
+
+r.rerankScore>=75
+&&
+firstCorrectRank===0
+
 ){
 
-firstRelevantRank=i+1;
+
+firstCorrectRank=index+1;
+
 
 }
 
 
-});
+}
+
+);
+
 
 
 
 let mrr =
 
-firstRelevantRank
+firstCorrectRank
 ?
-1/firstRelevantRank
+1/firstCorrectRank
 :
 0;
 
@@ -2641,31 +2716,44 @@ firstRelevantRank
 
 
 
-// Simplified NDCG
+
+
+
+
+// NDCG
+
 
 
 let dcg=0;
 
 
+
 rerankedResults
 .slice(0,k)
 .forEach(
-(r,i)=>{
+
+(r,index)=>{
 
 
 let relevance =
+
 r.rerankScore/100;
 
 
 
 dcg +=
 
-relevance /
-Math.log2(i+2);
+relevance/
+
+Math.log2(index+2);
 
 
 
-});
+}
+
+);
+
+
 
 
 
@@ -2674,13 +2762,20 @@ let idcg=0;
 
 
 for(
+
 let i=0;
+
 i<k;
+
 i++
+
 ){
 
+
 idcg +=
-1 /
+
+1/
+
 Math.log2(i+2);
 
 
@@ -2688,8 +2783,13 @@ Math.log2(i+2);
 
 
 
+
+
 let ndcg =
+
 dcg/idcg;
+
+
 
 
 
@@ -2697,26 +2797,35 @@ return {
 
 
 precision:
+
 Math.round(
 precision*100
 ),
 
 
+
 recall:
+
 Math.round(
 recall*100
 ),
 
 
+
 mrr:
+
 mrr.toFixed(2),
 
 
+
 ndcg:
+
 ndcg.toFixed(2)
 
 
+
 };
+
 
 
 }
@@ -2729,12 +2838,9 @@ ndcg.toFixed(2)
 
 
 
-
-
-// =================================
-// LLM RESPONSE SIMULATION
-// =================================
-
+// =======================================
+// LLM RESPONSE GENERATION
+// =======================================
 
 
 function generateLLMResponse(){
@@ -2746,29 +2852,24 @@ activate("llmCard");
 
 
 let best =
+
 rerankedResults[0];
 
 
 
-let temperatureElement =
-document
-.getElementById("temperature");
-
-
-
 let temperature =
-temperatureElement
-?
-temperatureElement.value
-:
-0.2;
+
+document
+.getElementById("temperature")
+.value;
 
 
 
 
 
 let metrics =
-calculateEvaluationMetrics();
+
+calculateMetrics();
 
 
 
@@ -2782,7 +2883,8 @@ best.rerankScore
 *
 (
 1-
-temperature*0.3
+temperature*0.25
+
 )
 
 );
@@ -2793,10 +2895,14 @@ temperature*0.3
 
 let hallucination =
 
-confidence>85
+confidence>=85
+
 ?
+
 "LOW"
+
 :
+
 "MEDIUM";
 
 
@@ -2805,8 +2911,8 @@ confidence>85
 
 
 
-
 let answer =
+
 
 `
 
@@ -2818,16 +2924,26 @@ Based on the retrieved knowledge:
 
 <b>
 
-${best.text.substring(0,400)}
+${
+
+best.chunk.text
+
+.substring(
+0,
+400
+)
+
+}
 
 </b>
+
 
 
 <br><br>
 
 
-The answer has been generated using
-the retrieved document context.
+The response has been generated using
+retrieved document context.
 
 
 `;
@@ -2839,18 +2955,16 @@ the retrieved document context.
 
 
 
-
-
 document
 .getElementById("llmOutput")
-.innerHTML =
-
-
+.innerHTML=
 
 `
 
 <h3>
+
 🤖 Generated Answer
+
 </h3>
 
 
@@ -2862,25 +2976,30 @@ ${answer}
 
 
 
+
 <h3>
+
 📚 Citation
+
 </h3>
 
+
+Source:
 
 
 <span class="success">
 
-Source:
+${best.chunk.source}
 
-${best.source}
+</span>
+
 
 <br>
 
+
 Chunk:
 
-${best.chunkId}
-
-</span>
+${best.chunk.id}
 
 
 
@@ -2888,19 +3007,28 @@ ${best.chunkId}
 
 
 
+
 <h3>
-🎯 Ground Truth Used
+
+🎯 Ground Truth Evidence
+
 </h3>
 
 
-
-The response was grounded from:
+The model used this retrieved passage:
 
 
 <br><br>
 
 
-"${best.text.substring(0,300)}..."
+"${
+
+best.chunk.text.substring(
+0,
+300
+)
+
+}"
 
 
 
@@ -2908,12 +3036,13 @@ The response was grounded from:
 
 
 
-<h3>
-Why this response?
 
+
+<h3>
+
+Why this answer?
 
 </h3>
-
 
 
 ✓ Highest semantic similarity
@@ -2921,17 +3050,18 @@ Why this response?
 
 <br>
 
-✓ BM25 keyword match
+✓ Strong keyword alignment
 
 
 <br>
 
-✓ Highest reranker score
+✓ Highest re-ranking score
 
 
 <br>
 
-✓ Retrieved from uploaded knowledge base
+✓ Grounded in uploaded knowledge base
+
 
 
 
@@ -2940,7 +3070,9 @@ Why this response?
 
 
 
+
 <h3>
+
 ⚙️ LLM Parameters
 
 </h3>
@@ -2955,9 +3087,14 @@ ${temperature}
 <br>
 
 
-Confidence:
+Answer Confidence:
+
+
+<span class="success">
 
 ${confidence}%
+
+</span>
 
 
 
@@ -2970,15 +3107,18 @@ ${hallucination}
 
 
 
+
+
 <hr>
 
 
 
+
 <h3>
-📊 RAG Evaluation Metrics
+
+📊 RAG Evaluation
 
 </h3>
-
 
 
 Precision@5:
@@ -2990,7 +3130,6 @@ ${metrics.precision}%
 <br>
 
 
-
 Recall@5:
 
 ${metrics.recall}%
@@ -3000,7 +3139,6 @@ ${metrics.recall}%
 <br>
 
 
-
 MRR:
 
 ${metrics.mrr}
@@ -3008,7 +3146,6 @@ ${metrics.mrr}
 
 
 <br>
-
 
 
 NDCG@5:
@@ -3026,13 +3163,23 @@ Overall RAG Quality:
 
 <span class="success">
 
-${Math.round(
+
+${
+
+Math.round(
+
 (
-metrics.precision+
-metrics.recall+
+metrics.precision
++
+metrics.recall
++
 confidence
+
 )/3
-)}%
+
+)
+
+}%
 
 </span>
 
