@@ -1,0 +1,1685 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Advanced RAG Simulator</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    font-family:Inter,Segoe UI,Arial;
+}
+
+
+body{
+    margin:0;
+    background:#070b18;
+    color:#e5e7eb;
+}
+
+
+header{
+
+padding:25px;
+text-align:center;
+background:
+linear-gradient(135deg,#111827,#312e81);
+
+}
+
+
+header h1{
+
+font-size:34px;
+margin:0;
+
+}
+
+
+header p{
+
+color:#c7d2fe;
+
+}
+
+
+
+.container{
+
+padding:25px;
+
+}
+
+
+
+.panel{
+
+background:#111827;
+border:1px solid #1f2937;
+border-radius:18px;
+padding:20px;
+margin-bottom:20px;
+
+}
+
+
+
+.controls{
+
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:15px;
+
+}
+
+
+
+input,select{
+
+width:100%;
+padding:12px;
+background:#020617;
+border:none;
+border-radius:10px;
+color:white;
+
+}
+
+
+
+button{
+
+background:#6366f1;
+border:none;
+padding:14px 25px;
+border-radius:12px;
+color:white;
+font-weight:bold;
+cursor:pointer;
+
+}
+
+
+button:hover{
+
+background:#818cf8;
+
+}
+
+
+
+.pipeline{
+
+display:grid;
+grid-template-columns:
+repeat(auto-fit,minmax(320px,1fr));
+
+gap:20px;
+
+}
+
+
+
+.card{
+
+background:#111827;
+padding:20px;
+border-radius:18px;
+border:1px solid #1f2937;
+
+}
+
+
+
+.card.active{
+
+border:2px solid #818cf8;
+box-shadow:
+0 0 25px #6366f180;
+
+}
+
+
+
+.card h2{
+
+color:#a5b4fc;
+
+}
+
+
+
+.output{
+
+background:#020617;
+padding:15px;
+border-radius:12px;
+margin-top:15px;
+font-size:14px;
+line-height:1.6;
+overflow:auto;
+
+}
+
+
+
+.vector{
+
+color:#4ade80;
+
+}
+
+
+
+.score{
+
+color:#facc15;
+
+}
+
+
+
+.citation{
+
+color:#38bdf8;
+
+}
+
+
+
+.small{
+
+color:#94a3b8;
+font-size:13px;
+
+}
+
+
+</style>
+
+
+</head>
+
+
+<body>
+
+
+
+<header>
+
+<h1>
+🧠 Advanced RAG Simulator
+</h1>
+
+<p>
+Document → Chunk → Embed → Retrieve → Rerank → LLM
+</p>
+
+
+</header>
+
+
+
+
+<div class="container">
+
+
+
+<div class="panel">
+
+
+<h2>
+1. Knowledge Base Upload
+</h2>
+
+
+<input 
+type="file"
+id="fileUpload"
+multiple
+accept=".txt,.pdf"
+/>
+
+
+<div class="output" id="documents">
+
+No documents uploaded
+
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="panel">
+
+
+<h2>
+2. Chunking Configuration
+</h2>
+
+
+<div class="controls">
+
+
+<div>
+
+<label>
+Chunk Length (characters)
+</label>
+
+<input 
+type="number"
+id="chunkSize"
+value="500">
+
+</div>
+
+
+
+
+<div>
+
+<label>
+Chunk Overlap
+</label>
+
+
+<input 
+type="number"
+id="overlap"
+value="100">
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="panel">
+
+
+<h2>
+3. User Query
+</h2>
+
+
+
+<input
+
+id="query"
+
+placeholder=
+"Ask your question here..."
+
+>
+
+
+
+<br><br>
+
+
+<button onclick="runRAG()">
+
+🚀 Run RAG Pipeline
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+<div class="pipeline">
+
+
+
+
+
+
+<div class="card" id="chunkCard">
+
+<h2>
+📄 Chunking Engine
+</h2>
+
+
+<div class="small">
+
+Splits documents based on your configuration
+
+</div>
+
+
+<div class="output" id="chunks">
+
+Waiting...
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div class="card" id="embeddingCard">
+
+
+<h2>
+🔢 Embedding Model
+</h2>
+
+
+<div class="small">
+
+Text converted into vector representation
+
+</div>
+
+
+
+<div class="output vector" id="embeddings">
+
+Waiting...
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div class="card" id="vectorCard">
+
+
+<h2>
+🌲 Pinecone Vector Database
+</h2>
+
+
+<div class="small">
+
+Vector + metadata storage
+
+</div>
+
+
+<div class="output" id="vectorDB">
+
+Waiting...
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div class="card" id="queryCard">
+
+
+<h2>
+🔍 Query Embedding
+</h2>
+
+
+<div class="output vector" id="queryEmbedding">
+
+Waiting...
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div class="card" id="retrievalCard">
+
+
+<h2>
+⚡ Hybrid Retrieval
+
+</h2>
+
+
+<div class="small">
+
+BM25 + Vector Search
+
+</div>
+
+
+<div class="output score" id="retrieval">
+
+Waiting...
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div class="card" id="rerankCard">
+
+
+<h2>
+
+🏆 Re-ranking Model
+
+</h2>
+
+
+<div class="small">
+
+Cross Encoder relevance scoring
+
+</div>
+
+
+<div class="output" id="rerank">
+
+Waiting...
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div class="card" id="promptCard">
+
+
+<h2>
+
+📝 Augmented Prompt
+
+</h2>
+
+
+<div class="output" id="prompt">
+
+Waiting...
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div class="card" id="llmCard">
+
+
+<h2>
+
+🤖 LLM Generated Response
+
+</h2>
+
+
+<div class="output" id="answer">
+
+Waiting...
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<script>
+
+
+let documents=[];
+
+let chunks=[];
+
+let vectors=[];
+
+
+
+document
+.getElementById("fileUpload")
+.addEventListener(
+"change",
+async function(e){
+
+
+documents=[];
+
+
+for(let file of e.target.files){
+
+let text=
+await file.text();
+
+
+documents.push({
+
+name:file.name,
+
+text:text
+
+});
+
+
+}
+
+
+
+document.getElementById("documents")
+.innerHTML=
+documents.map(d=>
+
+`
+📄 ${d.name}
+<br>
+Characters:
+${d.text.length}
+
+`
+
+).join("<hr>");
+
+
+
+});
+
+
+
+
+
+function sleep(ms){
+
+return new Promise(
+resolve=>setTimeout(resolve,ms)
+);
+
+}
+
+
+
+async function activate(id){
+
+let el=document.getElementById(id);
+
+el.classList.add("active");
+
+await sleep(700);
+
+el.classList.remove("active");
+
+
+}
+
+// ===============================
+// TEXT CHUNKING ENGINE
+// ===============================
+
+
+function createChunks(text,size,overlap){
+
+let result=[];
+
+let start=0;
+
+
+while(start < text.length){
+
+
+let end=start+size;
+
+
+let chunk=text.substring(start,end);
+
+
+result.push(chunk);
+
+
+
+start=end-overlap;
+
+
+if(start<0)
+start=0;
+
+
+}
+
+
+return result;
+
+}
+
+
+
+
+
+// ===============================
+// SIMULATED EMBEDDING MODEL
+// ===============================
+
+
+function generateEmbedding(text){
+
+
+// deterministic fake vector
+// based on text characters
+
+
+let vector=[];
+
+
+for(let i=0;i<12;i++){
+
+
+let value=0;
+
+
+for(let j=i;j<text.length;j+=12){
+
+value += text.charCodeAt(j);
+
+}
+
+
+vector.push(
+Number(
+((value%100)/100)
+.toFixed(3)
+)
+);
+
+
+
+}
+
+
+return vector;
+
+
+}
+
+
+
+
+
+
+// ===============================
+// COSINE SIMILARITY
+// ===============================
+
+
+function cosineSimilarity(a,b){
+
+
+let dot=0;
+
+let magA=0;
+
+let magB=0;
+
+
+
+for(let i=0;i<a.length;i++){
+
+
+dot += a[i]*b[i];
+
+
+magA += a[i]*a[i];
+
+
+magB += b[i]*b[i];
+
+
+}
+
+
+return (
+dot /
+(Math.sqrt(magA)*Math.sqrt(magB))
+).toFixed(3);
+
+
+}
+
+
+
+
+
+
+
+// ===============================
+// BM25 SIMULATION
+// ===============================
+
+
+function bm25(query,text){
+
+
+let q=query
+.toLowerCase()
+.split(" ");
+
+
+let score=0;
+
+
+q.forEach(word=>{
+
+
+if(
+text.toLowerCase()
+.includes(word)
+){
+
+score+=1;
+
+}
+
+
+});
+
+
+return Math.min(
+score/q.length,
+1
+).toFixed(2);
+
+
+}
+
+
+
+
+
+
+
+
+
+// ===============================
+// BUILD VECTOR DATABASE
+// ===============================
+
+
+function buildVectorDB(){
+
+
+vectors=[];
+
+
+chunks.forEach((chunk,index)=>{
+
+
+vectors.push({
+
+id:index+1,
+
+text:chunk,
+
+embedding:
+generateEmbedding(chunk),
+
+
+metadata:{
+
+
+source:
+documents[0]?.name ||
+"sample_document.pdf",
+
+
+page:
+Math.floor(index/2)+1
+
+
+}
+
+
+
+});
+
+
+});
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ===============================
+// MAIN RAG PIPELINE
+// ===============================
+
+
+
+async function runRAG(){
+
+
+
+if(documents.length===0){
+
+
+documents=[{
+
+name:
+"refund_policy.pdf",
+
+
+text:
+
+`
+Refund policy:
+Customers can return products within 30 days.
+Damaged products are exceptions.
+Refunds are processed after inspection.
+Electronics warranty covers manufacturing defects.
+`
+}];
+
+
+
+}
+
+
+
+
+
+let text=
+documents
+.map(x=>x.text)
+.join("\n");
+
+
+
+
+
+// CHUNKING
+
+
+await activate("chunkCard");
+
+
+
+let size=
+Number(
+document
+.getElementById("chunkSize")
+.value
+);
+
+
+let overlap=
+Number(
+document
+.getElementById("overlap")
+.value
+);
+
+
+
+chunks=createChunks(
+text,
+size,
+overlap
+);
+
+
+
+document
+.getElementById("chunks")
+.innerHTML=
+
+
+chunks.map((c,i)=>
+
+`
+<b>
+Chunk ${i+1}
+</b>
+
+<br>
+
+${c.substring(0,200)}
+
+...
+
+`
+
+).join("<hr>");
+
+
+
+
+
+
+
+
+
+
+// EMBEDDINGS
+
+
+
+await activate("embeddingCard");
+
+
+vectors=[];
+
+
+chunks.forEach((chunk,index)=>{
+
+
+vectors.push({
+
+id:index+1,
+
+text:chunk,
+
+embedding:
+generateEmbedding(chunk),
+
+metadata:{
+
+source:
+documents[0].name,
+
+page:index+1
+
+}
+
+
+});
+
+
+});
+
+
+
+
+document
+.getElementById("embeddings")
+.innerHTML=
+
+
+vectors.slice(0,3)
+.map(v=>
+
+`
+Chunk ${v.id}
+
+<br>
+
+Vector:
+
+<br>
+
+[
+${v.embedding.join(",")}
+]
+
+<br>
+
+Dimensions:
+${v.embedding.length}
+
+`
+
+)
+.join("<hr>");
+
+
+
+
+
+
+
+
+
+// VECTOR DATABASE
+
+
+
+await activate("vectorCard");
+
+
+
+document
+.getElementById("vectorDB")
+.innerHTML=
+
+
+`
+🌲 Pinecone Index
+
+<br><br>
+
+Namespace:
+customer-knowledge-base
+
+<br>
+
+Vectors Stored:
+${vectors.length}
+
+<br>
+
+Metadata:
+
+<br>
+
+{
+source:"${documents[0].name}",
+page:"1"
+}
+
+`;
+
+
+
+
+
+
+
+
+
+
+// QUERY EMBEDDING
+
+
+
+await activate("queryCard");
+
+
+let query=
+
+document
+.getElementById("query")
+.value
+||
+"What is refund policy?";
+
+
+
+let queryVector=
+generateEmbedding(query);
+
+
+
+document
+.getElementById("queryEmbedding")
+.innerHTML=
+
+`
+
+Query:
+
+${query}
+
+<br><br>
+
+Embedding:
+
+<br>
+
+[
+${queryVector.join(",")}
+]
+
+`;
+
+
+
+
+
+
+
+
+
+
+
+// RETRIEVAL
+
+
+await activate("retrievalCard");
+
+
+
+let results=[];
+
+
+
+vectors.forEach(v=>{
+
+
+let cosine=
+Number(
+cosineSimilarity(
+queryVector,
+v.embedding
+)
+);
+
+
+
+let keyword=
+Number(
+bm25(
+query,
+v.text
+)
+);
+
+
+
+let hybrid=
+(
+cosine*0.6+
+keyword*0.4
+);
+
+
+
+results.push({
+
+...v,
+
+cosine,
+
+keyword,
+
+hybrid
+
+
+});
+
+
+
+});
+
+
+
+
+
+results.sort(
+(a,b)=>
+b.hybrid-a.hybrid
+);
+
+
+
+
+
+let best=
+results.slice(0,5);
+
+
+
+document
+.getElementById("retrieval")
+.innerHTML=
+
+
+best.map((r,i)=>
+
+
+`
+
+<b>
+Result ${i+1}
+</b>
+
+<br>
+
+Cosine Similarity:
+
+${r.cosine}
+
+<br>
+
+BM25:
+
+${r.keyword}
+
+<br>
+
+
+Hybrid Accuracy:
+
+${Math.round(
+r.hybrid*100
+)}%
+
+
+<br>
+
+Confidence:
+
+${Math.round(
+(0.7+r.hybrid*0.3)*100
+)}%
+
+
+`
+
+).join("<hr>");
+
+
+
+
+
+
+
+
+
+
+
+// RERANKING
+
+
+
+await activate("rerankCard");
+
+
+
+let reranked=
+best.map((r,index)=>({
+
+rank:index+1,
+
+text:r.text,
+
+score:
+Math.round(
+(
+r.hybrid+
+Math.random()*0.1
+)
+*100
+)
+
+}))
+.sort(
+(a,b)=>b.score-a.score
+);
+
+
+
+
+document
+.getElementById("rerank")
+.innerHTML=
+
+reranked.map((r,i)=>
+
+`
+
+🏆 Rank ${i+1}
+
+<br>
+
+Score:
+
+${r.score}%
+
+<br>
+
+Selected because:
+
+Semantic similarity + keyword relevance
+
+`
+
+).join("<hr>");
+
+// ===============================
+// AUGMENTED PROMPT GENERATION
+// ===============================
+
+
+await activate("promptCard");
+
+
+
+let topContext =
+reranked[0];
+
+
+
+let augmentedPrompt = `
+
+SYSTEM PROMPT:
+
+You are a helpful AI assistant.
+
+Rules:
+- Answer only from provided context.
+- Do not hallucinate.
+- Cite the source document.
+
+
+--------------------------------
+
+
+RETRIEVED CONTEXT:
+
+
+SOURCE:
+
+${documents[0].name}
+
+
+PAGE:
+
+${topContext.rank}
+
+
+
+CONTENT:
+
+${topContext.text}
+
+
+
+--------------------------------
+
+
+USER QUERY:
+
+
+${query}
+
+
+`;
+
+
+
+
+document
+.getElementById("prompt")
+.innerHTML =
+
+augmentedPrompt
+.replace(
+/\n/g,
+"<br>"
+);
+
+
+
+
+
+
+
+
+
+
+
+// ===============================
+// LLM GENERATION SIMULATION
+// ===============================
+
+
+
+await activate("llmCard");
+
+
+
+let temperature =
+document
+.getElementById("temperature")
+?.value
+||
+0.2;
+
+
+
+
+let confidence =
+Math.round(
+topContext.score
+*
+(1-temperature*0.5)
+);
+
+
+
+let hallucinationRisk =
+temperature>0.7
+?
+"Medium"
+:
+"Low";
+
+
+
+
+let answerText = `
+
+
+Based on the retrieved knowledge:
+
+
+${topContext.text}
+
+
+<br><br>
+
+
+The answer is generated using the retrieved document context.
+
+
+`;
+
+
+
+
+
+document
+.getElementById("answer")
+.innerHTML=
+
+
+`
+
+<h3>
+Generated Answer
+</h3>
+
+
+${answerText}
+
+
+
+<hr>
+
+
+<h3>
+📚 Citation
+</h3>
+
+
+<div class="citation">
+
+
+Source:
+
+${documents[0].name}
+
+
+<br>
+
+Page:
+
+${topContext.rank}
+
+
+</div>
+
+
+
+<hr>
+
+
+<h3>
+🎯 Ground Truth Used
+</h3>
+
+
+The response was grounded from:
+
+
+<br>
+
+
+"${topContext.text.substring(0,250)}..."
+
+
+<hr>
+
+
+
+<h3>
+Why this response was selected?
+
+
+</h3>
+
+
+✔ Highest semantic similarity
+
+<br>
+
+✔ Strong BM25 keyword match
+
+<br>
+
+✔ Highest reranker score
+
+
+<hr>
+
+
+<h3>
+LLM Parameters
+
+</h3>
+
+
+Temperature:
+
+${temperature}
+
+
+<br>
+
+
+Confidence:
+
+${confidence}%
+
+
+<br>
+
+
+Hallucination Risk:
+
+${hallucinationRisk}
+
+
+
+`;
+
+
+
+}
+
+
+
+
