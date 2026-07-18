@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>RAG Pipeline Simulator</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    font-family:Inter,Segoe UI,sans-serif;
+}
+
+body{
+    margin:0;
+    background:#0b1020;
+    color:#e5e7eb;
+}
+
+.header{
+    padding:25px;
+    background:linear-gradient(135deg,#111827,#1e293b);
+    text-align:center;
+}
+
+.header h1{
+    margin:0;
+    font-size:32px;
+}
+
+.header p{
+    color:#94a3b8;
+}
+
+.container{
+    padding:25px;
+}
+
+.input-box{
+    background:#111827;
+    padding:20px;
+    border-radius:15px;
+    margin-bottom:25px;
+}
+
+input{
+    width:80%;
+    padding:14px;
+    border-radius:10px;
+    border:none;
+    background:#1f2937;
+    color:white;
+    font-size:16px;
+}
+
+button{
+    padding:14px 22px;
+    border:none;
+    border-radius:10px;
+    background:#6366f1;
+    color:white;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+button:hover{
+    background:#818cf8;
+}
+
+
+.pipeline{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:20px;
+}
+
+
+.card{
+
+    background:#111827;
+    border-radius:18px;
+    padding:20px;
+    min-height:220px;
+    border:1px solid #1f2937;
+    transition:.3s;
+}
+
+
+.card.active{
+    border:2px solid #6366f1;
+    box-shadow:0 0 25px #6366f155;
+}
+
+
+.card h2{
+    color:#a5b4fc;
+    font-size:18px;
+}
+
+
+.status{
+    margin-top:15px;
+    color:#94a3b8;
+    font-size:14px;
+}
+
+
+.data{
+    margin-top:15px;
+    background:#020617;
+    padding:12px;
+    border-radius:10px;
+    font-size:13px;
+    overflow:auto;
+}
+
+
+.vector{
+    color:#22c55e;
+}
+
+
+.score{
+    color:#facc15;
+}
+
+.footer{
+    text-align:center;
+    padding:30px;
+    color:#64748b;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="header">
+
+<h1>🤖 RAG Pipeline Simulator</h1>
+
+<p>
+Understand Retrieval Augmented Generation step-by-step
+</p>
+
+</div>
+
+
+
+<div class="container">
+
+
+<div class="input-box">
+
+<input id="query"
+placeholder="Ask something... Example: What is refund policy?">
+
+<button onclick="runRAG()">
+Run RAG Pipeline
+</button>
+
+
+</div>
+
+
+
+
+<div class="pipeline">
+
+
+<div class="card" id="kb">
+<h2>1. Knowledge Base</h2>
+
+<div class="status">
+PDFs, Articles, Transcripts
+</div>
+
+<div class="data">
+refund_policy.pdf<br>
+product_manual.pdf<br>
+customer_support.txt
+</div>
+
+</div>
+
+
+
+
+<div class="card" id="clean">
+<h2>2. Cleaning + Deduplication</h2>
+
+<div class="status">
+Removing noise and duplicate content
+</div>
+
+<div class="data" id="cleanData">
+Waiting...
+</div>
+
+</div>
+
+
+
+
+<div class="card" id="chunk">
+<h2>3. Chunking</h2>
+
+<div class="status">
+Breaking documents into meaningful pieces
+</div>
+
+<div class="data" id="chunks">
+Waiting...
+</div>
+
+</div>
+
+
+
+
+<div class="card" id="embed">
+
+<h2>4. Embedding Model</h2>
+
+<div class="status">
+Text → Numerical vectors
+</div>
+
+
+<div class="data vector" id="vectors">
+Waiting...
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="card" id="db">
+
+<h2>5. Vector Database</h2>
+
+<div class="status">
+Pinecone / Supabase / pgvector
+</div>
+
+<div class="data">
+Stored vectors + metadata
+</div>
+
+</div>
+
+
+
+
+
+
+<div class="card" id="query">
+
+<h2>6. Query Embedding</h2>
+
+<div class="status">
+User question converted into vector
+</div>
+
+
+<div class="data vector" id="queryVector">
+Waiting...
+</div>
+
+</div>
+
+
+
+
+
+
+<div class="card" id="search">
+
+
+<h2>7. Hybrid Retrieval</h2>
+
+
+<div class="status">
+
+Vector similarity + BM25 keyword search
+
+</div>
+
+
+<div class="data" id="retrieval">
+Waiting...
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="card" id="rerank">
+
+
+<h2>8. Re-ranking Model</h2>
+
+
+<div class="status">
+
+Cross encoder improves relevance
+
+</div>
+
+
+<div class="data score" id="ranking">
+Waiting...
+</div>
+
+
+</div>
+
+
+
+
+
+
+<div class="card" id="prompt">
+
+
+<h2>9. Augmented Prompt</h2>
+
+
+<div class="status">
+
+Retrieved context + User query
+
+</div>
+
+
+<div class="data" id="context">
+Waiting...
+</div>
+
+
+</div>
+
+
+
+
+
+
+<div class="card" id="llm">
+
+
+<h2>10. LLM Generation</h2>
+
+
+<div class="status">
+
+Final grounded answer
+
+</div>
+
+
+<div class="data" id="answer">
+Waiting...
+</div>
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+<div class="footer">
+
+Built as an educational RAG architecture simulator
+
+</div>
+
+
+
+
+<script>
+
+
+function sleep(ms){
+return new Promise(resolve=>setTimeout(resolve,ms));
+}
+
+
+
+async function activate(id){
+
+let card=document.getElementById(id);
+
+card.classList.add("active");
+
+await sleep(900);
+
+card.classList.remove("active");
+
+}
+
+
+
+async function runRAG(){
+
+
+let userQuery=document.getElementById("query").value;
+
+
+if(!userQuery)
+userQuery="What is refund policy?";
+
+
+
+await activate("kb");
+
+
+
+await activate("clean");
+
+document.getElementById("cleanData").innerHTML=
+`
+Removed:
+<br>
+✓ Duplicate paragraphs
+<br>
+✓ Formatting noise
+<br>
+✓ Broken characters
+`;
+
+
+
+await activate("chunk");
+
+
+document.getElementById("chunks").innerHTML=
+`
+Chunk 1:
+Refunds accepted within 30 days
+
+<br><br>
+
+Chunk 2:
+Damaged products exceptions
+
+<br><br>
+
+Chunk 3:
+Replacement process
+`;
+
+
+
+
+await activate("embed");
+
+
+document.getElementById("vectors").innerHTML=
+`
+Chunk Vector:
+
+[0.24,0.81,-0.33,0.55...]
+
+<br>
+
+Dimension: 1536
+`;
+
+
+
+
+await activate("db");
+
+
+
+await activate("query");
+
+document.getElementById("queryVector").innerHTML=
+`
+Query:
+
+${userQuery}
+
+<br><br>
+
+Vector:
+
+[0.21,0.79,-0.31]
+`;
+
+
+
+
+
+await activate("search");
+
+
+document.getElementById("retrieval").innerHTML=
+`
+Vector Search:
+
+Refund policy chunk
+
+Similarity:
+0.92
+
+
+<br><br>
+
+BM25:
+
+"refund" keyword match
+
+Score:
+0.86
+
+<br><br>
+
+Hybrid Score:
+0.90
+`;
+
+
+
+
+await activate("rerank");
+
+
+document.getElementById("ranking").innerHTML=
+`
+1. Refund Policy Chunk
+
+Relevance:
+98%
+
+<br><br>
+
+2. Return Exceptions
+
+Relevance:
+82%
+
+<br><br>
+
+3. Shipping Policy
+
+Relevance:
+40%
+
+`;
+
+
+
+
+
+await activate("prompt");
+
+
+document.getElementById("context").innerHTML=
+`
+SYSTEM:
+
+Answer only using context.
+
+
+CONTEXT:
+
+Refunds accepted within 30 days.
+
+
+QUESTION:
+
+${userQuery}
+
+`;
+
+
+
+
+
+await activate("llm");
+
+
+document.getElementById("answer").innerHTML=
+`
+✅ Generated Answer:
+
+Based on the refund policy,
+customers can request a refund
+within 30 days of purchase.
+`;
+
+
+
+}
+
+
+</script>
+
+
+</body>
+</html>
