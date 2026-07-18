@@ -3,36 +3,46 @@
 
 <head>
 
-<title>Advanced RAG Simulator</title>
+<title>Enterprise RAG Simulator</title>
+
 
 <style>
 
 *{
-    box-sizing:border-box;
-    font-family:Inter,Segoe UI,Arial;
+box-sizing:border-box;
+font-family:Inter,Segoe UI,Arial;
 }
 
 
 body{
-    margin:0;
-    background:#070b18;
-    color:#e5e7eb;
+
+margin:0;
+background:#060b18;
+color:#e5e7eb;
+
 }
+
 
 
 header{
 
-padding:25px;
+padding:30px;
 text-align:center;
+
 background:
-linear-gradient(135deg,#111827,#312e81);
+linear-gradient(
+135deg,
+#111827,
+#312e81
+);
 
 }
 
 
+
 header h1{
 
-font-size:34px;
+font-size:36px;
 margin:0;
 
 }
@@ -43,6 +53,7 @@ header p{
 color:#c7d2fe;
 
 }
+
 
 
 
@@ -57,32 +68,40 @@ padding:25px;
 .panel{
 
 background:#111827;
-border:1px solid #1f2937;
 border-radius:18px;
-padding:20px;
-margin-bottom:20px;
+padding:22px;
+margin-bottom:22px;
+border:1px solid #1f2937;
 
 }
 
 
 
-.controls{
+.grid{
 
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:15px;
+grid-template-columns:
+repeat(auto-fit,minmax(280px,1fr));
+gap:20px;
 
 }
 
 
 
-input,select{
+input,button{
 
 width:100%;
 padding:12px;
-background:#020617;
-border:none;
 border-radius:10px;
+border:none;
+
+}
+
+
+
+input{
+
+background:#020617;
 color:white;
 
 }
@@ -92,14 +111,12 @@ color:white;
 button{
 
 background:#6366f1;
-border:none;
-padding:14px 25px;
-border-radius:12px;
 color:white;
 font-weight:bold;
 cursor:pointer;
 
 }
+
 
 
 button:hover{
@@ -114,7 +131,7 @@ background:#818cf8;
 
 display:grid;
 grid-template-columns:
-repeat(auto-fit,minmax(320px,1fr));
+repeat(auto-fit,minmax(350px,1fr));
 
 gap:20px;
 
@@ -127,7 +144,7 @@ gap:20px;
 background:#111827;
 padding:20px;
 border-radius:18px;
-border:1px solid #1f2937;
+border:1px solid #263244;
 
 }
 
@@ -135,15 +152,17 @@ border:1px solid #1f2937;
 
 .card.active{
 
-border:2px solid #818cf8;
+border:
+2px solid #818cf8;
+
 box-shadow:
-0 0 25px #6366f180;
+0 0 30px #6366f155;
 
 }
 
 
 
-.card h2{
+h2{
 
 color:#a5b4fc;
 
@@ -151,21 +170,29 @@ color:#a5b4fc;
 
 
 
-.output{
+.section-title{
 
-background:#020617;
-padding:15px;
-border-radius:12px;
-margin-top:15px;
-font-size:14px;
-line-height:1.6;
-overflow:auto;
+color:#38bdf8;
+font-weight:bold;
 
 }
 
 
 
-.vector{
+.io{
+
+background:#020617;
+padding:15px;
+border-radius:12px;
+margin-top:12px;
+font-size:14px;
+line-height:1.6;
+
+}
+
+
+
+.success{
 
 color:#4ade80;
 
@@ -173,26 +200,32 @@ color:#4ade80;
 
 
 
-.score{
+.remove{
 
-color:#facc15;
-
-}
-
-
-
-.citation{
-
-color:#38bdf8;
+background:#dc2626;
+padding:6px 12px;
+width:auto;
 
 }
 
 
 
-.small{
+.stats{
 
-color:#94a3b8;
-font-size:13px;
+display:flex;
+gap:15px;
+flex-wrap:wrap;
+
+}
+
+
+
+.stat{
+
+background:#020617;
+padding:15px;
+border-radius:12px;
+flex:1;
 
 }
 
@@ -210,11 +243,12 @@ font-size:13px;
 <header>
 
 <h1>
-🧠 Advanced RAG Simulator
+🧠 Enterprise RAG Simulator
 </h1>
 
+
 <p>
-Document → Chunk → Embed → Retrieve → Rerank → LLM
+Upload documents → Chunk → Embed → Pinecone → Retrieve → Rerank → LLM
 </p>
 
 
@@ -223,76 +257,174 @@ Document → Chunk → Embed → Retrieve → Rerank → LLM
 
 
 
+
 <div class="container">
 
+
+
+<!-- DOCUMENT UPLOAD -->
 
 
 <div class="panel">
 
 
 <h2>
-1. Knowledge Base Upload
+📚 1. Knowledge Base
 </h2>
 
 
 <input 
 type="file"
-id="fileUpload"
+id="documentsInput"
 multiple
-accept=".txt,.pdf"
-/>
+accept=".txt,.pdf,.docx">
 
 
-<div class="output" id="documents">
+<br><br>
+
+
+<button onclick="addDocuments()">
+
++ Add Documents
+
+</button>
+
+
+<br><br>
+
+
+
+<div id="uploadStatus"></div>
+
+
+
+<div id="documentList" class="io">
 
 No documents uploaded
 
 </div>
 
 
+
 </div>
 
 
 
+
+
+
+
+
+<!-- STATS -->
 
 
 <div class="panel">
 
 
 <h2>
-2. Chunking Configuration
+Knowledge Base Statistics
 </h2>
 
 
-<div class="controls">
+<div class="stats">
 
 
-<div>
+<div class="stat">
 
-<label>
-Chunk Length (characters)
-</label>
+Documents
 
-<input 
-type="number"
-id="chunkSize"
-value="500">
+<h2 id="docCount">
+0
+</h2>
+
+</div>
+
+
+<div class="stat">
+
+Chunks
+
+<h2 id="chunkCount">
+0
+</h2>
+
+</div>
+
+
+<div class="stat">
+
+Vectors
+
+<h2 id="vectorCount">
+0
+</h2>
+
+</div>
+
+
+<div class="stat">
+
+Embedding Size
+
+<h2>
+1536
+</h2>
+
+</div>
+
+
+
+</div>
+
 
 </div>
 
 
 
 
+
+
+
+
+<!-- CHUNK SETTINGS -->
+
+
+<div class="panel">
+
+
+<h2>
+✂️ 2. Chunking Configuration
+</h2>
+
+
+<div class="grid">
+
+
 <div>
 
 <label>
-Chunk Overlap
+Chunk Length
+</label>
+
+<input
+id="chunkSize"
+type="number"
+value="500">
+
+</div>
+
+
+
+<div>
+
+<label>
+Overlap Length
 </label>
 
 
-<input 
-type="number"
+<input
 id="overlap"
+type="number"
 value="100">
 
 
@@ -308,43 +440,12 @@ value="100">
 
 
 
-<div class="panel">
-
-
-<h2>
-3. User Query
-</h2>
-
-
-
-<input
-
-id="query"
-
-placeholder=
-"Ask your question here..."
-
->
-
-
-
-<br><br>
-
-
-<button onclick="runRAG()">
-
-🚀 Run RAG Pipeline
-
-</button>
-
-
-
-</div>
 
 
 
 
 
+<!-- PIPELINE -->
 
 
 
@@ -355,21 +456,54 @@ placeholder=
 
 
 
+<!-- CHUNK -->
+
+
 <div class="card" id="chunkCard">
 
+
 <h2>
-📄 Chunking Engine
+✂️ Chunking Engine
 </h2>
 
 
-<div class="small">
 
-Splits documents based on your configuration
+<div class="section-title">
+INPUT
+</div>
+
+
+<div class="io" id="chunkInput">
+
+Waiting for documents...
 
 </div>
 
 
-<div class="output" id="chunks">
+
+<div class="section-title">
+PROCESS
+</div>
+
+
+<div class="io">
+
+Sliding Window Chunking
+
+<br>
+
+User defined size + overlap
+
+</div>
+
+
+
+<div class="section-title">
+OUTPUT
+</div>
+
+
+<div class="io" id="chunksOutput">
 
 Waiting...
 
@@ -384,6 +518,9 @@ Waiting...
 
 
 
+
+
+<!-- EMBEDDING -->
 
 
 <div class="card" id="embeddingCard">
@@ -394,21 +531,46 @@ Waiting...
 </h2>
 
 
-<div class="small">
-
-Text converted into vector representation
-
+<div class="section-title">
+INPUT
 </div>
 
 
-
-<div class="output vector" id="embeddings">
+<div class="io" id="embeddingInput">
 
 Waiting...
 
 </div>
 
 
+<div class="section-title">
+PROCESS
+</div>
+
+
+<div class="io">
+
+Text embedding model
+
+<br>
+
+Converts text → vector
+
+</div>
+
+
+
+<div class="section-title">
+OUTPUT
+</div>
+
+
+<div class="io" id="embeddingOutput">
+
+Waiting...
+
+</div>
+
 
 </div>
 
@@ -420,7 +582,10 @@ Waiting...
 
 
 
-<div class="card" id="vectorCard">
+<!-- VECTOR DB -->
+
+
+<div class="card" id="pineconeCard">
 
 
 <h2>
@@ -428,14 +593,12 @@ Waiting...
 </h2>
 
 
-<div class="small">
-
-Vector + metadata storage
-
+<div class="section-title">
+INPUT
 </div>
 
 
-<div class="output" id="vectorDB">
+<div class="io" id="pineconeInput">
 
 Waiting...
 
@@ -443,6 +606,39 @@ Waiting...
 
 
 
+<div class="section-title">
+PROCESS
+</div>
+
+
+<div class="io">
+
+Store:
+
+<br>
+
+Vector
+
++
+
+Metadata
+
+</div>
+
+
+
+<div class="section-title">
+OUTPUT
+</div>
+
+
+<div class="io" id="pineconeOutput">
+
+Waiting...
+
+</div>
+
+
 </div>
 
 
@@ -451,17 +647,26 @@ Waiting...
 
 
 
+
+
+<!-- QUERY -->
 
 
 <div class="card" id="queryCard">
 
 
 <h2>
-🔍 Query Embedding
+🔍 User Query
 </h2>
 
 
-<div class="output vector" id="queryEmbedding">
+<input
+id="userQuery"
+placeholder=
+"Ask anything from your documents">
+
+
+<div class="io" id="queryOutput">
 
 Waiting...
 
@@ -476,6 +681,9 @@ Waiting...
 
 
 
+
+
+<!-- RETRIEVAL -->
 
 
 <div class="card" id="retrievalCard">
@@ -483,18 +691,32 @@ Waiting...
 
 <h2>
 ⚡ Hybrid Retrieval
-
 </h2>
 
 
-<div class="small">
+<div class="section-title">
 
-BM25 + Vector Search
+INPUT
 
 </div>
 
 
-<div class="output score" id="retrieval">
+<div class="io" id="retrievalInput">
+
+Waiting...
+
+</div>
+
+
+
+<div class="section-title">
+
+OUTPUT
+
+</div>
+
+
+<div class="io" id="retrievalOutput">
 
 Waiting...
 
@@ -509,26 +731,19 @@ Waiting...
 
 
 
+
+<!-- RERANK -->
 
 
 <div class="card" id="rerankCard">
 
 
 <h2>
-
 🏆 Re-ranking Model
-
 </h2>
 
 
-<div class="small">
-
-Cross Encoder relevance scoring
-
-</div>
-
-
-<div class="output" id="rerank">
+<div class="io" id="rerankOutput">
 
 Waiting...
 
@@ -543,19 +758,18 @@ Waiting...
 
 
 
+<!-- PROMPT -->
 
 
 <div class="card" id="promptCard">
 
 
 <h2>
-
 📝 Augmented Prompt
-
 </h2>
 
 
-<div class="output" id="prompt">
+<div class="io" id="promptOutput">
 
 Waiting...
 
@@ -570,19 +784,18 @@ Waiting...
 
 
 
+<!-- LLM -->
 
 
 <div class="card" id="llmCard">
 
 
 <h2>
-
-🤖 LLM Generated Response
-
+🤖 LLM Response
 </h2>
 
 
-<div class="output" id="answer">
+<div class="io" id="llmOutput">
 
 Waiting...
 
@@ -595,12 +808,11 @@ Waiting...
 
 
 
-
 </div>
 
 
-</div>
 
+</div>
 
 
 
@@ -610,54 +822,189 @@ Waiting...
 
 let documents=[];
 
+
 let chunks=[];
+
 
 let vectors=[];
 
 
 
+</script>
+
+
+</body>
+
+</html>
+let documents = [];
+
+let chunks = [];
+
+let vectors = [];
+
+
+
+
+
+// ===============================
+// ADD DOCUMENTS
+// ===============================
+
+
+async function addDocuments(){
+
+
+let files =
 document
-.getElementById("fileUpload")
-.addEventListener(
-"change",
-async function(e){
+.getElementById("documentsInput")
+.files;
 
 
-documents=[];
+
+if(files.length===0){
+
+alert("Please select documents");
+
+return;
+
+}
 
 
-for(let file of e.target.files){
 
-let text=
+for(let file of files){
+
+
+let text="";
+
+
+try{
+
+
+text =
 await file.text();
+
+
+}
+catch(e){
+
+
+text =
+"Unable to extract text from file";
+
+
+}
+
 
 
 documents.push({
 
+id:
+Date.now()+Math.random(),
+
+
 name:file.name,
 
-text:text
+
+text:text,
+
+
+size:file.size
+
 
 });
+
 
 
 }
 
 
 
-document.getElementById("documents")
+document
+.getElementById("uploadStatus")
 .innerHTML=
-documents.map(d=>
-
 `
-📄 ${d.name}
+<div class="success">
+
+✅ Successfully uploaded 
+${files.length}
+document(s)
+
+</div>
+`;
+
+
+
+renderDocuments();
+
+
+updateStats();
+
+
+processKnowledgeBase();
+
+
+}
+
+
+
+
+
+
+
+
+
+// ===============================
+// DISPLAY DOCUMENT LIST
+// ===============================
+
+
+
+function renderDocuments(){
+
+
+
+let html="";
+
+
+
+documents.forEach(doc=>{
+
+
+html+=`
+
+<div>
+
+
+📄 
+<b>${doc.name}</b>
+
+
 <br>
+
 Characters:
-${d.text.length}
 
-`
+${doc.text.length}
 
-).join("<hr>");
+
+<br><br>
+
+
+<button 
+class="remove"
+onclick="removeDocument('${doc.id}')">
+
+Remove
+
+</button>
+
+
+<hr>
+
+
+</div>
+
+
+`;
 
 
 
@@ -666,68 +1013,557 @@ ${d.text.length}
 
 
 
+document
+.getElementById("documentList")
+.innerHTML =
+html ||
+"No documents uploaded";
 
-function sleep(ms){
 
-return new Promise(
-resolve=>setTimeout(resolve,ms)
+
+}
+
+
+
+
+
+
+
+
+// ===============================
+// REMOVE DOCUMENT
+// ===============================
+
+
+
+function removeDocument(id){
+
+
+
+documents =
+documents.filter(
+d=>d.id!=id
 );
 
-}
 
 
+renderDocuments();
 
-async function activate(id){
 
-let el=document.getElementById(id);
+processKnowledgeBase();
 
-el.classList.add("active");
 
-await sleep(700);
-
-el.classList.remove("active");
+updateStats();
 
 
 }
 
+
+
+
+
+
+
+
+
 // ===============================
-// TEXT CHUNKING ENGINE
+// CHUNKING ENGINE
 // ===============================
 
 
-function createChunks(text,size,overlap){
+function createChunks(
+text,
+chunkSize,
+overlap,
+source
+){
+
 
 let result=[];
 
+
 let start=0;
+
+
+let counter=1;
+
 
 
 while(start < text.length){
 
 
-let end=start+size;
-
-
-let chunk=text.substring(start,end);
-
-
-result.push(chunk);
+let end =
+Math.min(
+start+chunkSize,
+text.length
+);
 
 
 
-start=end-overlap;
+let chunk =
+text.substring(
+start,
+end
+);
 
 
-if(start<0)
-start=0;
+
+
+let overlapText="";
+
+
+
+if(start>0){
+
+
+overlapText =
+text.substring(
+start-overlap,
+start
+);
 
 
 }
+
+
+
+result.push({
+
+id:
+counter++,
+
+
+text:chunk,
+
+
+overlap:
+overlapText,
+
+
+source:source
+
+
+});
+
+
+
+start =
+end-overlap;
+
+
+
+if(start>=text.length)
+break;
+
+
+}
+
 
 
 return result;
 
+
+
 }
+
+
+
+
+
+
+
+
+
+// ===============================
+// PROCESS KNOWLEDGE BASE
+// ===============================
+
+
+
+function processKnowledgeBase(){
+
+
+if(documents.length===0)
+return;
+
+
+
+chunks=[];
+
+vectors=[];
+
+
+
+let chunkSize =
+Number(
+document
+.getElementById("chunkSize")
+.value
+);
+
+
+
+let overlap =
+Number(
+document
+.getElementById("overlap")
+.value
+);
+
+
+
+
+
+
+// CREATE CHUNKS
+
+
+documents.forEach(doc=>{
+
+
+let docChunks =
+createChunks(
+
+doc.text,
+
+chunkSize,
+
+overlap,
+
+doc.name
+
+);
+
+
+
+chunks.push(
+...docChunks
+);
+
+
+
+});
+
+
+
+
+
+
+
+// CHUNK INPUT
+
+
+document
+.getElementById("chunkInput")
+.innerHTML=
+
+`
+
+Documents:
+
+${documents.length}
+
+
+<br>
+
+Chunk Size:
+
+${chunkSize}
+
+
+<br>
+
+Overlap:
+
+${overlap}
+
+`;
+
+
+
+
+
+
+
+
+
+
+
+// CHUNK OUTPUT
+
+
+
+document
+.getElementById("chunksOutput")
+.innerHTML =
+
+
+chunks
+.slice(0,10)
+.map(c=>
+
+
+`
+
+<b>
+${c.source}
+</b>
+
+
+<br>
+
+
+<b>
+Chunk ${c.id}
+</b>
+
+
+<br><br>
+
+
+<strong>
+Main Content:
+</strong>
+
+
+<br>
+
+
+${c.text.substring(0,250)}
+
+
+
+<br><br>
+
+
+
+<strong>
+Overlap Section:
+</strong>
+
+
+<br>
+
+
+<span style="color:#facc15">
+
+${c.overlap.substring(0,120)}
+
+</span>
+
+
+<hr>
+
+
+`
+
+)
+.join("");
+
+
+
+
+
+
+
+
+
+
+
+
+// ===============================
+// EMBEDDINGS
+// ===============================
+
+
+
+vectors =
+chunks.map(c=>{
+
+
+return {
+
+
+chunkId:c.id,
+
+
+source:c.source,
+
+
+text:c.text,
+
+
+vector:
+generateEmbedding(c.text),
+
+
+metadata:{
+
+source:c.source,
+
+chunk:c.id
+
+}
+
+
+};
+
+
+});
+
+
+
+
+
+
+
+
+
+document
+.getElementById("embeddingInput")
+.innerHTML=
+
+
+`
+
+Chunk:
+
+${chunks[0]?.text.substring(0,120)}
+
+`;
+
+
+
+
+
+document
+.getElementById("embeddingOutput")
+.innerHTML=
+
+`
+
+Original Text:
+
+
+"${chunks[0]?.text.substring(0,150)}"
+
+
+<br><br>
+
+
+Embedding Vector:
+
+
+<br>
+
+
+[
+
+${vectors[0]?.vector.join(", ")}
+
+]
+
+
+<br><br>
+
+
+Dimensions:
+
+1536
+
+
+`;
+
+
+
+
+
+
+
+
+
+
+
+
+// ===============================
+// PINECONE DATABASE
+// ===============================
+
+
+
+document
+.getElementById("pineconeInput")
+.innerHTML=
+
+`
+
+Vectors received:
+
+${vectors.length}
+
+
+<br>
+
+Metadata attached:
+
+Source
+
++
+
+Chunk ID
+
+
+`;
+
+
+
+document
+.getElementById("pineconeOutput")
+.innerHTML=
+
+`
+
+🌲 Pinecone Index Updated
+
+
+<br><br>
+
+
+Index:
+
+knowledge-base-index
+
+
+<br>
+
+
+Stored Vectors:
+
+${vectors.length}
+
+
+<br>
+
+
+Status:
+
+✅ Ready for Retrieval
+
+
+`;
+
+
+
+
+
+updateStats();
+
+
+}
+
+
+
+
 
 
 
@@ -738,14 +1574,13 @@ return result;
 // ===============================
 
 
+
 function generateEmbedding(text){
 
 
-// deterministic fake vector
-// based on text characters
-
 
 let vector=[];
+
 
 
 for(let i=0;i<12;i++){
@@ -756,16 +1591,23 @@ let value=0;
 
 for(let j=i;j<text.length;j+=12){
 
-value += text.charCodeAt(j);
+
+value +=
+text.charCodeAt(j);
+
 
 }
 
 
+
 vector.push(
+
 Number(
 ((value%100)/100)
 .toFixed(3)
+
 )
+
 );
 
 
@@ -783,186 +1625,78 @@ return vector;
 
 
 
-// ===============================
-// COSINE SIMILARITY
-// ===============================
-
-
-function cosineSimilarity(a,b){
-
-
-let dot=0;
-
-let magA=0;
-
-let magB=0;
-
-
-
-for(let i=0;i<a.length;i++){
-
-
-dot += a[i]*b[i];
-
-
-magA += a[i]*a[i];
-
-
-magB += b[i]*b[i];
-
-
-}
-
-
-return (
-dot /
-(Math.sqrt(magA)*Math.sqrt(magB))
-).toFixed(3);
-
-
-}
-
-
 
 
 
 
 
 // ===============================
-// BM25 SIMULATION
+// UPDATE STATS
 // ===============================
 
 
-function bm25(query,text){
+
+function updateStats(){
 
 
-let q=query
-.toLowerCase()
-.split(" ");
-
-
-let score=0;
-
-
-q.forEach(word=>{
-
-
-if(
-text.toLowerCase()
-.includes(word)
-){
-
-score+=1;
-
-}
-
-
-});
-
-
-return Math.min(
-score/q.length,
-1
-).toFixed(2);
-
-
-}
+document
+.getElementById("docCount")
+.innerHTML =
+documents.length;
 
 
 
+document
+.getElementById("chunkCount")
+.innerHTML =
+chunks.length;
 
 
 
-
-
-
-// ===============================
-// BUILD VECTOR DATABASE
-// ===============================
-
-
-function buildVectorDB(){
-
-
-vectors=[];
-
-
-chunks.forEach((chunk,index)=>{
-
-
-vectors.push({
-
-id:index+1,
-
-text:chunk,
-
-embedding:
-generateEmbedding(chunk),
-
-
-metadata:{
-
-
-source:
-documents[0]?.name ||
-"sample_document.pdf",
-
-
-page:
-Math.floor(index/2)+1
-
-
-}
-
-
-
-});
-
-
-});
+document
+.getElementById("vectorCount")
+.innerHTML =
+vectors.length;
 
 
 
 }
-
-
-
-
-
-
-
-
-
-// ===============================
-// MAIN RAG PIPELINE
-// ===============================
-
+// =================================
+// USER QUERY PIPELINE
+// =================================
 
 
 async function runRAG(){
 
 
+if(vectors.length===0){
 
-if(documents.length===0){
+alert(
+"Please upload documents first"
+);
+
+return;
+
+}
 
 
-documents=[{
 
-name:
-"refund_policy.pdf",
+let query =
+document
+.getElementById("userQuery")
+.value;
 
 
-text:
 
-`
-Refund policy:
-Customers can return products within 30 days.
-Damaged products are exceptions.
-Refunds are processed after inspection.
-Electronics warranty covers manufacturing defects.
-`
-}];
+if(!query){
 
+
+alert(
+"Please enter a query"
+);
+
+
+return;
 
 
 }
@@ -971,246 +1705,81 @@ Electronics warranty covers manufacturing defects.
 
 
 
-let text=
-documents
-.map(x=>x.text)
-.join("\n");
 
-
-
-
-
-// CHUNKING
-
-
-await activate("chunkCard");
-
-
-
-let size=
-Number(
-document
-.getElementById("chunkSize")
-.value
-);
-
-
-let overlap=
-Number(
-document
-.getElementById("overlap")
-.value
-);
-
-
-
-chunks=createChunks(
-text,
-size,
-overlap
-);
-
-
-
-document
-.getElementById("chunks")
-.innerHTML=
-
-
-chunks.map((c,i)=>
-
-`
-<b>
-Chunk ${i+1}
-</b>
-
-<br>
-
-${c.substring(0,200)}
-
-...
-
-`
-
-).join("<hr>");
-
-
-
-
-
-
-
-
-
-
-// EMBEDDINGS
-
-
-
-await activate("embeddingCard");
-
-
-vectors=[];
-
-
-chunks.forEach((chunk,index)=>{
-
-
-vectors.push({
-
-id:index+1,
-
-text:chunk,
-
-embedding:
-generateEmbedding(chunk),
-
-metadata:{
-
-source:
-documents[0].name,
-
-page:index+1
-
-}
-
-
-});
-
-
-});
-
-
-
-
-document
-.getElementById("embeddings")
-.innerHTML=
-
-
-vectors.slice(0,3)
-.map(v=>
-
-`
-Chunk ${v.id}
-
-<br>
-
-Vector:
-
-<br>
-
-[
-${v.embedding.join(",")}
-]
-
-<br>
-
-Dimensions:
-${v.embedding.length}
-
-`
-
-)
-.join("<hr>");
-
-
-
-
-
-
-
-
-
-// VECTOR DATABASE
-
-
-
-await activate("vectorCard");
-
-
-
-document
-.getElementById("vectorDB")
-.innerHTML=
-
-
-`
-🌲 Pinecone Index
-
-<br><br>
-
-Namespace:
-customer-knowledge-base
-
-<br>
-
-Vectors Stored:
-${vectors.length}
-
-<br>
-
-Metadata:
-
-<br>
-
-{
-source:"${documents[0].name}",
-page:"1"
-}
-
-`;
-
-
-
-
-
-
-
-
-
-
+// ===============================
 // QUERY EMBEDDING
+// ===============================
 
 
 
-await activate("queryCard");
-
-
-let query=
-
-document
-.getElementById("query")
-.value
-||
-"What is refund policy?";
+await activate(
+"queryCard"
+);
 
 
 
-let queryVector=
+let queryVector =
 generateEmbedding(query);
 
 
 
 document
-.getElementById("queryEmbedding")
-.innerHTML=
+.getElementById("queryOutput")
+.innerHTML =
+
 
 `
 
-Query:
+<b>INPUT</b>
 
-${query}
-
-<br><br>
-
-Embedding:
 
 <br>
 
+User Query:
+
+${query}
+
+
+<br><br>
+
+
+<b>PROCESS</b>
+
+
+<br>
+
+Embedding Model converts query into vector
+
+
+<br><br>
+
+
+<b>OUTPUT</b>
+
+
+<br>
+
+
+Query Vector:
+
+
+<br>
+
+
 [
-${queryVector.join(",")}
+
+${queryVector.join(", ")}
+
 ]
+
+
+<br><br>
+
+
+Dimensions:
+
+1536
+
 
 `;
 
@@ -1223,11 +1792,16 @@ ${queryVector.join(",")}
 
 
 
+// ===============================
+// HYBRID RETRIEVAL
+// ===============================
 
-// RETRIEVAL
 
 
-await activate("retrievalCard");
+await activate(
+"retrievalCard"
+);
+
 
 
 
@@ -1238,30 +1812,35 @@ let results=[];
 vectors.forEach(v=>{
 
 
-let cosine=
+let cosine =
 Number(
 cosineSimilarity(
 queryVector,
-v.embedding
+v.vector
 )
+
 );
 
 
 
-let keyword=
+let bm25 =
 Number(
-bm25(
+calculateBM25(
 query,
 v.text
 )
+
 );
 
 
 
-let hybrid=
+let hybrid =
+
 (
-cosine*0.6+
-keyword*0.4
+cosine*0.6
++
+bm25*0.4
+
 );
 
 
@@ -1272,7 +1851,7 @@ results.push({
 
 cosine,
 
-keyword,
+bm25,
 
 hybrid
 
@@ -1287,6 +1866,10 @@ hybrid
 
 
 
+
+// sort best first
+
+
 results.sort(
 (a,b)=>
 b.hybrid-a.hybrid
@@ -1296,107 +1879,281 @@ b.hybrid-a.hybrid
 
 
 
-let best=
+let topResults =
 results.slice(0,5);
 
 
 
+
+window.topResults =
+topResults;
+
+
+
+
+
+
+
 document
-.getElementById("retrieval")
+.getElementById("retrievalInput")
+.innerHTML=
+
+`
+
+<b>INPUT</b>
+
+
+<br>
+
+Query Vector
+
++
+
+Pinecone Index
+
+
+<br><br>
+
+
+Search Method:
+
+<br>
+
+60% Semantic Vector Search
+
+<br>
+
+40% BM25 Keyword Search
+
+
+`;
+
+
+
+
+
+
+
+
+
+document
+.getElementById("retrievalOutput")
 .innerHTML=
 
 
-best.map((r,i)=>
-
+topResults.map(
+(r,index)=>
 
 `
 
 <b>
-Result ${i+1}
+Result ${index+1}
 </b>
 
+
+<br><br>
+
+
+Source:
+
+${r.source}
+
+
 <br>
+
+
+Chunk:
+
+${r.chunkId}
+
+
+<br><br>
+
 
 Cosine Similarity:
 
+<span class="score">
+
 ${r.cosine}
+
+</span>
+
 
 <br>
 
-BM25:
 
-${r.keyword}
+BM25 Score:
+
+<span class="score">
+
+${r.bm25}
+
+</span>
+
+
 
 <br>
 
 
 Hybrid Accuracy:
 
+
+<span class="success">
+
 ${Math.round(
 r.hybrid*100
 )}%
 
+</span>
+
 
 <br>
 
+
 Confidence:
 
+
 ${Math.round(
-(0.7+r.hybrid*0.3)*100
+(
+0.7+
+r.hybrid*0.3
+)
+*100
 )}%
+
+
+<hr>
 
 
 `
 
-).join("<hr>");
-
-
-
-
-
-
-
-
-
-
-
-// RERANKING
-
-
-
-await activate("rerankCard");
-
-
-
-let reranked=
-best.map((r,index)=>({
-
-rank:index+1,
-
-text:r.text,
-
-score:
-Math.round(
-(
-r.hybrid+
-Math.random()*0.1
 )
-*100
-)
+.join("");
 
-}))
-.sort(
-(a,b)=>b.score-a.score
+
+
+
+
+
+
+
+
+
+
+
+// ===============================
+// RE-RANKING MODEL
+// ===============================
+
+
+
+await activate(
+"rerankCard"
 );
 
 
 
 
+
+let reranked =
+
+topResults.map(r=>{
+
+
+let rerankScore =
+
+Math.min(
+
+100,
+
+Math.round(
+
+(
+r.hybrid*100
+
++
+
+Math.random()*10
+
+)
+
+)
+
+);
+
+
+
+return {
+
+
+...r,
+
+
+rerankScore
+
+
+};
+
+
+
+})
+
+.sort(
+
+(a,b)=>
+
+b.rerankScore-a.rerankScore
+
+);
+
+
+
+
+
+window.rerankedResults =
+reranked;
+
+
+
+
+
+
+
+
 document
-.getElementById("rerank")
+.getElementById("rerankOutput")
 .innerHTML=
 
-reranked.map((r,i)=>
+
+`
+
+<b>
+Cross Encoder Re-ranking
+</b>
+
+<br><br>
+
+
+Input:
+
+Top ${topResults.length}
+retrieved chunks
+
+
+<br><br>
+
+
+
+Output:
+
+
+<br><br>
+
+
+${
+
+reranked.map(
+(r,i)=>
 
 `
 
@@ -1404,76 +2161,61 @@ reranked.map((r,i)=>
 
 <br>
 
-Score:
 
-${r.score}%
+Source:
+
+${r.source}
+
 
 <br>
 
-Selected because:
 
-Semantic similarity + keyword relevance
+Chunk:
+
+${r.chunkId}
+
+
+<br>
+
+
+Relevance Score:
+
+
+<span class="success">
+
+${r.rerankScore}%
+
+</span>
+
+
+
+<br>
+
+
+Reason:
+
+
+<br>
+
+✓ Semantic match
+
+<br>
+
+✓ Keyword alignment
+
+<br>
+
+✓ Context relevance
+
+
+<hr>
 
 `
 
-).join("<hr>");
+)
+.join("")
 
-// ===============================
-// AUGMENTED PROMPT GENERATION
-// ===============================
-
-
-await activate("promptCard");
-
-
-
-let topContext =
-reranked[0];
-
-
-
-let augmentedPrompt = `
-
-SYSTEM PROMPT:
-
-You are a helpful AI assistant.
-
-Rules:
-- Answer only from provided context.
-- Do not hallucinate.
-- Cite the source document.
-
-
---------------------------------
-
-
-RETRIEVED CONTEXT:
-
-
-SOURCE:
-
-${documents[0].name}
-
-
-PAGE:
-
-${topContext.rank}
-
-
-
-CONTENT:
-
-${topContext.text}
-
-
-
---------------------------------
-
-
-USER QUERY:
-
-
-${query}
+}
 
 
 `;
@@ -1481,17 +2223,15 @@ ${query}
 
 
 
-document
-.getElementById("prompt")
-.innerHTML =
-
-augmentedPrompt
-.replace(
-/\n/g,
-"<br>"
-);
 
 
+
+// Continue to prompt generation
+
+generateAugmentedPrompt();
+
+
+}
 
 
 
@@ -1501,58 +2241,290 @@ augmentedPrompt
 
 
 
-// ===============================
-// LLM GENERATION SIMULATION
-// ===============================
+
+
+// =================================
+// COSINE SIMILARITY
+// =================================
 
 
 
-await activate("llmCard");
+function cosineSimilarity(a,b){
 
 
 
-let temperature =
-document
-.getElementById("temperature")
-?.value
-||
-0.2;
+let dot=0;
+
+let magA=0;
+
+let magB=0;
 
 
 
+for(
+let i=0;
+i<a.length;
+i++
+){
 
-let confidence =
-Math.round(
-topContext.score
+
+dot +=
+a[i]*b[i];
+
+
+magA +=
+a[i]*a[i];
+
+
+magB +=
+b[i]*b[i];
+
+
+}
+
+
+
+return (
+
+dot /
+(
+Math.sqrt(magA)
 *
-(1-temperature*0.5)
+Math.sqrt(magB)
+
+)
+
+).toFixed(3);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+// =================================
+// BM25 SIMULATION
+// =================================
+
+
+
+function calculateBM25(
+query,
+text
+){
+
+
+let words =
+query
+.toLowerCase()
+.split(" ");
+
+
+
+let score=0;
+
+
+
+words.forEach(word=>{
+
+
+if(
+text
+.toLowerCase()
+.includes(word)
+){
+
+
+score +=1;
+
+
+}
+
+
+
+});
+
+
+
+return Math.min(
+
+score /
+words.length,
+
+1
+
+)
+.toFixed(3);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+// =================================
+// CARD ANIMATION
+// =================================
+
+
+
+function activate(id){
+
+
+let card =
+document
+.getElementById(id);
+
+
+
+if(card){
+
+
+card.classList.add(
+"active"
 );
 
 
-
-let hallucinationRisk =
-temperature>0.7
-?
-"Medium"
-:
-"Low";
+setTimeout(()=>{
 
 
+card.classList.remove(
+"active"
+);
 
 
-let answerText = `
+},800);
 
 
-Based on the retrieved knowledge:
+}
 
 
-${topContext.text}
+
+}
+// =================================
+// AUGMENTED PROMPT GENERATION
+// =================================
+
+
+function generateAugmentedPrompt(){
+
+
+if(!rerankedResults ||
+rerankedResults.length===0)
+return;
+
+
+
+activate("promptCard");
+
+
+
+let best =
+rerankedResults[0];
+
+
+
+let query =
+document
+.getElementById("userQuery")
+.value;
+
+
+
+let prompt =
+
+`
+
+<b>SYSTEM PROMPT</b>
 
 
 <br><br>
 
 
-The answer is generated using the retrieved document context.
+You are a Retrieval Augmented AI assistant.
+
+
+<br>
+
+
+Rules:
+
+
+<br>
+
+✓ Answer only from provided context
+
+<br>
+
+✓ Do not hallucinate
+
+<br>
+
+✓ Cite the source document
+
+
+<hr>
+
+
+<b>RETRIEVED CONTEXT</b>
+
+
+<br><br>
+
+
+SOURCE:
+
+${best.source}
+
+
+<br>
+
+
+CHUNK ID:
+
+${best.chunkId}
+
+
+<br><br>
+
+
+CONTENT:
+
+
+<br>
+
+
+${best.text}
+
+
+
+<hr>
+
+
+<b>USER QUERY</b>
+
+
+<br>
+
+
+${query}
+
 
 
 `;
@@ -1562,22 +2534,332 @@ The answer is generated using the retrieved document context.
 
 
 document
-.getElementById("answer")
-.innerHTML=
+.getElementById("promptOutput")
+.innerHTML =
+prompt;
+
+
+
+generateLLMResponse();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =================================
+// RAG EVALUATION METRICS
+// =================================
+
+
+
+function calculateEvaluationMetrics(){
+
+
+
+let k =
+Math.min(
+5,
+rerankedResults.length
+);
+
+
+
+let relevant =
+
+rerankedResults.filter(r=>
+
+r.rerankScore>=75
+
+).length;
+
+
+
+let precision =
+
+relevant/k;
+
+
+
+let totalRelevant =
+
+Math.max(
+relevant+1,
+k
+);
+
+
+
+let recall =
+
+relevant/totalRelevant;
+
+
+
+
+
+// MRR
+
+
+let firstRelevantRank=0;
+
+
+rerankedResults.forEach(
+(r,i)=>{
+
+
+if(
+r.rerankScore>=75 &&
+firstRelevantRank===0
+){
+
+firstRelevantRank=i+1;
+
+}
+
+
+});
+
+
+
+let mrr =
+
+firstRelevantRank
+?
+1/firstRelevantRank
+:
+0;
+
+
+
+
+
+// Simplified NDCG
+
+
+let dcg=0;
+
+
+rerankedResults
+.slice(0,k)
+.forEach(
+(r,i)=>{
+
+
+let relevance =
+r.rerankScore/100;
+
+
+
+dcg +=
+
+relevance /
+Math.log2(i+2);
+
+
+
+});
+
+
+
+let idcg=0;
+
+
+
+for(
+let i=0;
+i<k;
+i++
+){
+
+idcg +=
+1 /
+Math.log2(i+2);
+
+
+}
+
+
+
+let ndcg =
+dcg/idcg;
+
+
+
+return {
+
+
+precision:
+Math.round(
+precision*100
+),
+
+
+recall:
+Math.round(
+recall*100
+),
+
+
+mrr:
+mrr.toFixed(2),
+
+
+ndcg:
+ndcg.toFixed(2)
+
+
+};
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+// =================================
+// LLM RESPONSE SIMULATION
+// =================================
+
+
+
+function generateLLMResponse(){
+
+
+
+activate("llmCard");
+
+
+
+let best =
+rerankedResults[0];
+
+
+
+let temperatureElement =
+document
+.getElementById("temperature");
+
+
+
+let temperature =
+temperatureElement
+?
+temperatureElement.value
+:
+0.2;
+
+
+
+
+
+let metrics =
+calculateEvaluationMetrics();
+
+
+
+
+
+let confidence =
+
+Math.round(
+
+best.rerankScore
+*
+(
+1-
+temperature*0.3
+)
+
+);
+
+
+
+
+
+let hallucination =
+
+confidence>85
+?
+"LOW"
+:
+"MEDIUM";
+
+
+
+
+
+
+
+
+let answer =
+
+`
+
+Based on the retrieved knowledge:
+
+
+<br><br>
+
+
+<b>
+
+${best.text.substring(0,400)}
+
+</b>
+
+
+<br><br>
+
+
+The answer has been generated using
+the retrieved document context.
+
+
+`;
+
+
+
+
+
+
+
+
+
+
+document
+.getElementById("llmOutput")
+.innerHTML =
+
 
 
 `
 
 <h3>
-Generated Answer
+🤖 Generated Answer
 </h3>
 
 
-${answerText}
+${answer}
 
 
 
 <hr>
+
 
 
 <h3>
@@ -1585,26 +2867,25 @@ ${answerText}
 </h3>
 
 
-<div class="citation">
 
+<span class="success">
 
 Source:
 
-${documents[0].name}
-
+${best.source}
 
 <br>
 
-Page:
+Chunk:
 
-${topContext.rank}
+${best.chunkId}
 
-
-</div>
+</span>
 
 
 
 <hr>
+
 
 
 <h3>
@@ -1612,13 +2893,15 @@ ${topContext.rank}
 </h3>
 
 
+
 The response was grounded from:
 
 
-<br>
+<br><br>
 
 
-"${topContext.text.substring(0,250)}..."
+"${best.text.substring(0,300)}..."
+
 
 
 <hr>
@@ -1626,28 +2909,39 @@ The response was grounded from:
 
 
 <h3>
-Why this response was selected?
+Why this response?
 
 
 </h3>
 
 
-✔ Highest semantic similarity
+
+✓ Highest semantic similarity
+
 
 <br>
 
-✔ Strong BM25 keyword match
+✓ BM25 keyword match
+
 
 <br>
 
-✔ Highest reranker score
+✓ Highest reranker score
+
+
+<br>
+
+✓ Retrieved from uploaded knowledge base
+
 
 
 <hr>
 
 
+
+
 <h3>
-LLM Parameters
+⚙️ LLM Parameters
 
 </h3>
 
@@ -1655,6 +2949,7 @@ LLM Parameters
 Temperature:
 
 ${temperature}
+
 
 
 <br>
@@ -1665,13 +2960,81 @@ Confidence:
 ${confidence}%
 
 
+
 <br>
 
 
 Hallucination Risk:
 
-${hallucinationRisk}
+${hallucination}
 
+
+
+<hr>
+
+
+
+<h3>
+📊 RAG Evaluation Metrics
+
+</h3>
+
+
+
+Precision@5:
+
+${metrics.precision}%
+
+
+
+<br>
+
+
+
+Recall@5:
+
+${metrics.recall}%
+
+
+
+<br>
+
+
+
+MRR:
+
+${metrics.mrr}
+
+
+
+<br>
+
+
+
+NDCG@5:
+
+${metrics.ndcg}
+
+
+
+<hr>
+
+
+
+Overall RAG Quality:
+
+
+<span class="success">
+
+${Math.round(
+(
+metrics.precision+
+metrics.recall+
+confidence
+)/3
+)}%
+
+</span>
 
 
 `;
@@ -1679,7 +3042,3 @@ ${hallucinationRisk}
 
 
 }
-
-
-
-
